@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const corsMiddleware = require('./middlewares/cors');
 const apiRoutes = require('./routes/api');
 
@@ -6,8 +7,9 @@ const app = express();
 const PORT = 5000;
 
 // Middleware
-app.use(corsMiddleware); // Mengaktifkan CORS
-app.use(express.json()); // Parsing JSON
+app.use(corsMiddleware);
+app.use(express.json());
+app.use(cookieParser()); 
 
 // Route utama untuk cek server
 app.get('/', (req, res) => {
