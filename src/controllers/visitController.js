@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 
-// Simulasi penyimpanan guest dan visit
+// Simulasi penyimpanan guest dan visit dengan penambahan rfid_uid
 let guestStore = [
   { id: uuidv4(), nik: '36720047456', nama: 'Ilham Andalas', instansi: 'PT. Example', rfid_uid: 'AB12CD34BC5B2' },
   { id: uuidv4(), nik: '23575955784', nama: 'Muhammad Andalas', instansi: 'CV. Example', rfid_uid: 'EF56GH780VH2' }
@@ -20,7 +20,8 @@ let visitStore = [
     kendaraan_tamu: "-",
     plat_kendaraan: "-",
     security_induction: "belum",
-    ttd: "-"  // Menambahkan field ttd
+    ttd: "-",  // Menambahkan field ttd
+    rfid_uid: 'AB12CD34BC5B2' // Tambahan rfid_uid
   },
   {
     id: uuidv4(),
@@ -35,7 +36,8 @@ let visitStore = [
     kendaraan_tamu: "Motor",
     plat_kendaraan: "A 5678 DEF",
     security_induction: "belum",
-    ttd: "-"  // Menambahkan field ttd
+    ttd: "-",  // Menambahkan field ttd
+    rfid_uid: 'EF56GH780VH2' // Tambahan rfid_uid
   }
 ];
 
@@ -94,7 +96,8 @@ exports.scanRFID = (req, res) => {
     kendaraan_tamu: "-", // Default
     plat_kendaraan: "-", // Default
     security_induction: "belum", // Default
-    ttd: "-" // Default
+    ttd: "-", // Default
+    rfid_uid: guest.rfid_uid // Menambahkan rfid_uid
   };
 
   visitStore.push(newVisit); // Tambahkan ke visitStore
@@ -128,6 +131,31 @@ exports.addVisit = (req, res) => {
 
   res.status(200).json({
     message: 'Visit updated successfully!',
+    updatedVisit: visitStore[visitIndex]
+  });
+};
+
+// Function to edit jam_out using RFID UID
+exports.editJamOut = (req, res) => {
+  const { rfid_uid } = req.body; // Ambil rfid_uid dari body
+
+  // Cari data visit berdasarkan rfid_uid dengan jam_out "-"
+  const visitIndex = visitStore.findIndex(
+    item => item.rfid_uid === rfid_uid && item.jam_out === "-"
+  );
+
+  if (visitIndex === -1) {
+    return res.status(404).json({ 
+      message: 'No visit found with the provided RFID UID and jam_out "-"!' 
+    });
+  }
+
+  // Update jam_out ke waktu saat ini
+  const currentTime = new Date().toTimeString().split(' ')[0]; // Format HH:MM:SS
+  visitStore[visitIndex].jam_out = currentTime;
+
+  res.status(200).json({
+    message: 'Jam out updated successfully!',
     updatedVisit: visitStore[visitIndex]
   });
 };
