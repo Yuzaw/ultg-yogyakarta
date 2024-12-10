@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scanKTP</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <script src= "scripts/include.js" defer></script>
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <header>
+        <div data-include="components/navigation.html"></div>
+    </header>
+
+    <main>
+        <section class="scan-ktp">
+            <div class="scan-ktp-container">
+                <h2>Form Scan KTP</h2>
+                <p>Scan KTP anda, Mohon lengkapi data di bawah ini:</p>
+                <div class="can-ktp-image">
+                    <img src="../images/icon2.png" alt="Scan KTP anda">
+                </div>
+                
+                <form class="scan-ktp-form">
+                    <!-- Keperluan & No. Kartu Sejajar -->
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="keperluan">Keperluan:</label>
+                            <input type="text" id="keperluan" name="keperluan" placeholder="Keperluan">
+                        </div>
+                        <div class="form-group">
+                            <label for="noKartu">No. Kartu:</label>
+                            <input type="text" id="noKartu" name="noKartu" placeholder="No. Kartu">
+                        </div>
+                    </div>
+        
+                    <!-- Kendaraan & Plat Kendaraan -->
+                    <div class="form-group">
+                        <label for="kendaraan">Kendaraan (Isi “-” Jika Tidak Ada):</label>
+                        <input type="text" id="kendaraan" name="kendaraan" placeholder="Kendaraan">
+                    </div>
+                    <div class="form-group">
+                        <label for="platKendaraan">Plat Kendaraan (Isi “-” Jika Tidak Ada):</label>
+                        <input type="text" id="platKendaraan" name="platKendaraan" placeholder="Plat Kendaraan">
+                    </div>
+        
+                    <!-- Radio Button for Security Induction -->
+                    <div class="form-group">
+                        <label for="securityInduction">Security Induction:</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="security-induction" value="Sudah" />
+                                Sudah
+                            </label>
+                            <label>
+                                <input type="radio" name="security-induction" value="Belum" />
+                                Belum
+                            </label>
+                        </div>
+                        
+                    </div>
+        
+                    <!-- Submit Button -->
+                    <div class="button">
+                        <button type="submit">Kirim</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

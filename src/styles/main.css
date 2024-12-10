@@ -1,0 +1,493 @@
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('../images/background.png');
+    color: white;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    background-color: rgba(0, 0, 0, 0);
+    width: 100%;
+}
+
+.navigation img {
+    height: 50px;
+    margin-right: 20px;
+}
+
+.navigation h1 {
+    font-size: 24px;
+    color: #00ffff;
+    margin: 0;
+}
+
+.nav {
+    display: flex;
+    background-color: #000482;
+    border-radius: 10px;
+    margin-right: 20px;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    display: inline-block;
+    box-sizing: border-box;
+    background-color: transparent;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+.nav a:hover {
+    color: #00ffff;
+    border: 2px solid #ffffff;
+    border-radius: 3%;
+}
+.hamburger-menu {
+    display: none; /* Hide the hamburger menu on desktop */
+}
+
+/* Hide navigation links on small screens */
+@media (max-width: 768px) {
+    .nav {
+        display: none; /* Hide the navigation links by default */
+        width: 100%;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #000482;
+        padding: 10px 0;
+        border-radius: 0;
+    }
+
+    .nav a {
+        margin: 10px 0;
+    }
+
+    .hamburger-menu {
+        display: block; /* Show hamburger icon */
+        cursor: pointer;
+    }
+
+    /* Optional: Style the hamburger menu */
+    .hamburger-menu {
+        font-size: 30px;
+        color: #ffffff;
+    }
+}
+
+/* When the menu is active, show the navigation links */
+.nav.active {
+    display: flex;
+}
+
+
+
+
+main {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    /* height: 100vh; */
+    display: flex;
+    justify-content: center; /* Pusatkan secara horizontal */
+    align-items: center;    /* Pusatkan secara vertikal */
+    color: white;
+}
+.container {
+    width: 600px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    justify-content: center;
+}
+
+h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+p {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.camera {
+    width: 100%;
+    height: 200px;
+    background-color: #444;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 3px dashed #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ddd;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #666;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #2a2a2a;
+    color: white;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:focus {
+    outline: none;
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px #6c63ff;
+}
+
+.button {
+    text-align: center;
+}
+
+button {
+    background-color: #6c63ff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background-color: #534bc4;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Main Content Scan KTP*/
+.scan-ktp-container {
+    width:800px;
+    background-color: rgba(255, 255, 255, 0.1); /* Transparent white */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px; /* Added margin to move the form down */
+}
+
+/* Heading */
+.scan-ktp-container h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Subtext */
+.scan-ktp-container p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #ddd;
+}
+
+/* Camera Placeholder (for KTP scanning) */
+.camera-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #444;
+    border-radius: 10px;
+    border: 3px dashed #fff;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Form Fields */
+.scan-ktp-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+/* Input Fields in a Row */
+.scan-ktp-form .form-group-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Labels */
+.scan-ktp-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ddd;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Input Fields */
+.scan-ktp-form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #666;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #2a2a2a;
+    color: white;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Focus State for Input Fields */
+.scan-ktp-form input[type="text"]:focus {
+    outline: none;
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px #6c63ff;
+}
+
+/* Grouping radio buttons */
+.radio-group {
+    display: flex;
+    flex-direction: row; /* Align horizontally */
+    align-items: center; /* Align vertically */
+    justify-content: flex-start; /* Align to the left */
+    gap: 20px; /* Add spacing between radio buttons */
+    margin-bottom: 20px; /* Add spacing below the group */
+}
+
+/* Styling for each label */
+.radio-group label {
+    display: flex;
+    align-items: center; /* Center vertically with the radio input */
+    font-size: 16px;
+    color: white;
+    cursor: pointer; /* Makes the label clickable */
+}
+
+/* Radio input adjustments */
+.radio-group input[type="radio"] {
+    margin-right: 10px; /* Add space between the radio button and the label */
+    cursor: pointer; /* Make it clickable */
+}
+
+
+/* Button Styling */
+.scan-ktp-form .button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.scan-ktp-form button {
+    background-color: #6c63ff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Button Hover Effect */
+.scan-ktp-form button:hover {
+    background-color: #534bc4;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+
+/*--------------------------------------------*/
+.ultg-content {
+    padding: 20px;
+    text-align: center;
+    overflow-x: auto
+    /* margin-bottom: 500px; */
+  }
+  
+  .ultg-heading {
+    font-size: 32px;
+  }
+  
+  /* Table Styles */
+  .ultg-table-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .ultg-table {
+    width: 1200px;
+    border-collapse: collapse;
+    background-color: #333;
+    color: white;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .ultg-table th,
+  .ultg-table td {
+    border: 1px solid #555;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .ultg-table th {
+    background-color: #444;
+    font-size: 18px;
+  }
+  
+  .ultg-table td {
+    font-size: 16px;
+  }
+  
+  .ultg-table th:first-child {
+    width: 10%;
+  }
+  
+  /* Download Button */
+  .ultg-download-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #6a1b9a;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .ultg-download-button i {
+    margin-left: 5px;
+  }
+  
+  .ultg-download-button:hover {
+    background-color: #9c27b0;
+  }
+
+@media screen and (max-width: 768px) {
+    .ultg-heading {
+        font-size: 20px;
+    }
+
+    .ultg-table th {
+        font-size: 10px;
+    }
+      
+    .ultg-table td {
+        font-size: 8px;
+    }
+}
+
+
+
+
+/* Container untuk tabel tamu */
+/* Container untuk tabel tamu */
+/* Tabel utama */
+
+.container-guest{
+    justify-content: center;
+    text-align: center;
+    overflow-x: auto
+}
+.guest-table-container {
+    overflow-x: auto; /* Scroll horizontal untuk layar kecil */
+    margin: 20px;
+    border: 1px solid #555;
+
+}
+
+
+/* Tabel */
+.guest-table {
+    width: 100%;
+    min-width: 1200px; /* Set minimum lebar tabel agar tetap penuh di layar kecil */
+    border-collapse: collapse;
+    background-color: #333;
+    color: white;
+
+    overflow: hidden;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.guest-table th,
+.guest-table td {
+    border: 1px solid #555;
+    padding: 10px;
+    text-align: center;
+}
+
+.guest-table th {
+    background-color: #444;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.guest-table td {
+    background-color: #222;
+}
+
+/* Header bertingkat */
+.guest-table th[colspan] {
+    background-color: #555;
+}
+
+/* Responsivitas */
+@media screen and (max-width: 768px) {
+    .guest-table-container {
+        margin: 10px;
+    }
+    .guest-table {
+        font-size: 12px; /* Kurangi ukuran font agar lebih sesuai */
+    }
+}
+
