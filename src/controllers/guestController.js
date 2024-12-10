@@ -2,30 +2,43 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
 const Tesseract = require('tesseract.js');
-const upload = require('../middlewares/upload');
+const firestore = require('../config/firestore'); // Import Firestore instance
 
-let guestStore = [
-  { id: uuidv4(), nik: '36720047456', nama: 'Ilham Andalas', instansi: 'PT. Example', rfid_uid: 'AB12CD34BC5B2' },
-  { id: uuidv4(), nik: '23575955784', nama: 'Muhammad Andalas', instansi: 'CV. Example', rfid_uid: 'EF56GH780VH2' }
-];
+const guestCollection = firestore.collection('guests'); // Nama koleksi Firestore
 
-// Get all guest
-exports.getAllGuest = (req, res) => {
-  res.json({ message: 'All guest retrieved successfully!', guest: guestStore });
+// Get all guests
+exports.getAllGuest = async (req, res) => {
+  try {
+    const snapshot = await guestCollection.get();
+    const guests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    res.json({ message: 'All guests retrieved successfully!', guests });
+  } catch (error) {
+    console.error('Error fetching guests:', error);
+    res.status(500).json({ message: 'Failed to retrieve guests', error: error.message });
+  }
 };
 
 // Get guest by NIK
-exports.getGuestByNIK = (req, res) => {
+exports.getGuestByNIK = async (req, res) => {
   const { nik } = req.params;
-  const guest = guestStore.find(item => item.nik === nik);
-  
-  if (!guest) {
-    return res.status(404).json({ message: 'Guest not found!' });
+
+  try {
+    const snapshot = await guestCollection.where('nik', '==', nik).get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ message: 'Guest not found!' });
+    }
+
+    const guest = snapshot.docs[0].data();
+    res.json({ message: 'Guest retrieved successfully!', guest });
+  } catch (error) {
+    console.error('Error fetching guest by NIK:', error);
+    res.status(500).json({ message: 'Failed to retrieve guest', error: error.message });
   }
-  
-  res.json({ message: 'Guest retrieved successfully!', guest });
 };
 
+// Scan KTP
 exports.scanKTP = async (req, res) => {
   try {
     if (!req.file) {
@@ -53,33 +66,31 @@ exports.scanKTP = async (req, res) => {
     console.log('Cleaned NIK:', nik);
     console.log('Extracted Name:', nama);
 
-    // Cek apakah NIK sudah ada di guestStore
-    const existingGuest = guestStore.find(item => item.nik === nik);
-    if (existingGuest) {
+    // Cek apakah NIK sudah ada di Firestore
+    const existingSnapshot = await guestCollection.where('nik', '==', nik).get();
+    if (!existingSnapshot.empty) {
       return res.status(400).json({
         message: 'NIK already registered!',
-        guest: existingGuest,
+        guest: existingSnapshot.docs[0].data(),
       });
     }
 
     // Jika NIK belum terdaftar, buat data tamu baru
     const newGuest = {
-      id: uuidv4(),  // Generate a unique ID using UUID
-      nik: nik,
-      nama: nama,
+      nik,
+      nama,
       instansi: 'Unknown', // Default value for instansi
       rfid_uid: null, // Set RFID UID awal ke null
     };
 
-    // Tambahkan tamu baru ke guestStore
-    guestStore.push(newGuest);
+    // Tambahkan tamu baru ke Firestore
+    const newDoc = await guestCollection.add(newGuest);
 
     // Hapus file yang telah diproses
     fs.unlink(imagePath, (err) => {
       if (err) console.error('Error deleting file:', err);
     });
 
-    // Respons dengan teks hasil OCR dan data tamu baru
     res.status(200).json({
       message: 'KTP scanned and guest added successfully!',
       extractedText: text,
@@ -87,7 +98,7 @@ exports.scanKTP = async (req, res) => {
         nik: nik || 'NIK not found',
         nama: nama || 'Name not found',
       },
-      newGuest: newGuest,
+      newGuest: { id: newDoc.id, ...newGuest },
     });
   } catch (error) {
     console.error(error);
@@ -104,76 +115,89 @@ exports.scanKTP = async (req, res) => {
 };
 
 // Update guest by ID
-exports.updateGuestById = (req, res) => {
-  const { id } = req.params; // Ambil ID dari parameter URL
-  const { nik, nama, instansi } = req.body; // Ambil data baru dari body request
+exports.updateGuestById = async (req, res) => {
+  const { id } = req.params;
+  const { nik, nama, instansi } = req.body;
 
-  // Cari tamu berdasarkan ID
-  const guestIndex = guestStore.findIndex(item => item.id === id);
+  try {
+    const guestRef = guestCollection.doc(id);
+    const guestSnapshot = await guestRef.get();
 
-  if (guestIndex === -1) {
-    return res.status(404).json({ message: 'Guest not found!' });
-  }
-
-  // Validasi untuk memastikan NIK unik (jika NIK diubah)
-  if (nik && nik !== guestStore[guestIndex].nik) {
-    const nikExists = guestStore.some(item => item.nik === nik);
-    if (nikExists) {
-      return res.status(400).json({ message: 'NIK already registered to another guest!' });
+    if (!guestSnapshot.exists) {
+      return res.status(404).json({ message: 'Guest not found!' });
     }
+
+    // Validasi untuk memastikan NIK unik
+    if (nik && nik !== guestSnapshot.data().nik) {
+      const nikSnapshot = await guestCollection.where('nik', '==', nik).get();
+      if (!nikSnapshot.empty) {
+        return res.status(400).json({ message: 'NIK already registered to another guest!' });
+      }
+    }
+
+    // Perbarui data tamu
+    const updatedGuest = {
+      ...guestSnapshot.data(),
+      nik: nik || guestSnapshot.data().nik,
+      nama: nama || guestSnapshot.data().nama,
+      instansi: instansi || guestSnapshot.data().instansi,
+    };
+
+    await guestRef.set(updatedGuest);
+
+    res.json({
+      message: 'Guest updated successfully!',
+      updatedGuest,
+    });
+  } catch (error) {
+    console.error('Error updating guest:', error);
+    res.status(500).json({ message: 'Failed to update guest', error: error.message });
   }
-
-  // Perbarui data tamu
-  const updatedGuest = {
-    ...guestStore[guestIndex],
-    nik: nik || guestStore[guestIndex].nik, // Gunakan data baru atau data lama
-    nama: nama || guestStore[guestIndex].nama,
-    instansi: instansi || guestStore[guestIndex].instansi,
-  };
-
-  // Simpan perubahan ke guestStore
-  guestStore[guestIndex] = updatedGuest;
-
-  res.json({
-    message: 'Guest updated successfully!',
-    updatedGuest,
-  });
 };
 
 // Update RFID by NIK
-exports.updateRFIDByNIK = (req, res) => {
-  const { nik } = req.params; // Ambil NIK dari parameter URL
-  const { rfid_uid } = req.body; // Ambil RFID UID dari body request
+exports.updateRFIDByNIK = async (req, res) => {
+  const { nik } = req.params;
+  const { rfid_uid } = req.body;
 
-  // Cari tamu berdasarkan NIK
-  const guest = guestStore.find(item => item.nik === nik);
+  try {
+    const snapshot = await guestCollection.where('nik', '==', nik).get();
 
-  if (!guest) {
-    return res.status(404).json({ message: 'Guest not found!' });
+    if (snapshot.empty) {
+      return res.status(404).json({ message: 'Guest not found!' });
+    }
+
+    const guestRef = snapshot.docs[0].ref;
+    const guestData = snapshot.docs[0].data();
+
+    const updatedGuest = { ...guestData, rfid_uid };
+    await guestRef.set(updatedGuest);
+
+    res.json({
+      message: 'RFID UID updated successfully!',
+      updatedGuest,
+    });
+  } catch (error) {
+    console.error('Error updating RFID:', error);
+    res.status(500).json({ message: 'Failed to update RFID', error: error.message });
   }
-
-  // Perbarui RFID UID
-  guest.rfid_uid = rfid_uid;
-
-  res.json({
-    message: 'RFID UID updated successfully!',
-    updatedGuest: guest,
-  });
 };
 
 // Delete guest
-exports.deleteGuest = (req, res) => {
+exports.deleteGuest = async (req, res) => {
   const { nik } = req.params;
-  
-  const index = guestStore.findIndex(item => item.nik === nik);
-  
-  if (index === -1) {
-    return res.status(404).json({ message: 'Guest not found!' });
+
+  try {
+    const snapshot = await guestCollection.where('nik', '==', nik).get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ message: 'Guest not found!' });
+    }
+
+    await snapshot.docs[0].ref.delete();
+    res.json({ message: 'Guest deleted successfully!' });
+  } catch (error) {
+    console.error('Error deleting guest:', error);
+    res.status(500).json({ message: 'Failed to delete guest', error: error.message });
   }
-  
-  const deletedguest = guestStore.splice(index, 1); // Remove guest from the array
-  res.json({
-    message: 'Guest deleted successfully!',
-    deletedguest,
-  });
 };

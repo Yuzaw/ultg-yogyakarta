@@ -1,179 +1,142 @@
-const { v4: uuidv4 } = require('uuid');
+const firestore = require('../config/firestore'); // Import Firestore
 
-// Simulasi penyimpanan guest dan visit dengan penambahan rfid_uid
-let guestStore = [
-  { id: uuidv4(), nik: '36720047456', nama: 'Ilham Andalas', instansi: 'PT. Example', rfid_uid: 'AB12CD34BC5B2' },
-  { id: uuidv4(), nik: '23575955784', nama: 'Muhammad Andalas', instansi: 'CV. Example', rfid_uid: 'EF56GH780VH2' }
-];
-
-let visitStore = [
-  {
-    id: uuidv4(),
-    nik: "36720047456",
-    nama: "Ilham Andalas",
-    instansi: "PT. Example",
-    keperluan: "Business",
-    jam_in: "08:00",
-    jam_out: "10:00",
-    tanggal: new Date().toISOString(),
-    no_kartu: "-",
-    kendaraan_tamu: "-",
-    plat_kendaraan: "-",
-    security_induction: "belum",
-    ttd: "-",  // Menambahkan field ttd
-    rfid_uid: 'AB12CD34BC5B2' // Tambahan rfid_uid
-  },
-  {
-    id: uuidv4(),
-    nik: "23575955784",
-    nama: "Muhammad Andalas",
-    instansi: "CV. Example",
-    keperluan: "Business",
-    jam_in: "08:00",
-    jam_out: "10:00",
-    tanggal: new Date().toISOString(),
-    no_kartu: "-",
-    kendaraan_tamu: "Motor",
-    plat_kendaraan: "A 5678 DEF",
-    security_induction: "belum",
-    ttd: "-",  // Menambahkan field ttd
-    rfid_uid: 'EF56GH780VH2' // Tambahan rfid_uid
-  }
-];
-
-// Fungsi untuk memeriksa apakah guest sudah terdaftar
-const isGuestRegistered = (nik, nama) => {
-  return guestStore.some(guest => guest.nik === nik && guest.nama === nama);
-};
+// Reference ke koleksi Firestore
+const guestCollection = firestore.collection('guests');
+const visitCollection = firestore.collection('visits');
 
 // Get all visits
-exports.getAllVisits = (req, res) => {
-  res.json({ message: 'All visits retrieved successfully!', visits: visitStore });
+exports.getAllVisits = async (req, res) => {
+  try {
+    const snapshot = await visitCollection.get();
+    const visits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json({ message: 'All visits retrieved successfully!', visits });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to retrieve visits', error: error.message });
+  }
 };
 
 // Get visit by NIK
-exports.getVisitByNIK = (req, res) => {
+exports.getVisitByNIK = async (req, res) => {
   const { nik } = req.params;
-  const visit = visitStore.find(item => item.nik === nik);
-
-  if (!visit) {
-    return res.status(404).json({ message: 'Visit not found!' });
+  try {
+    const snapshot = await visitCollection.where('nik', '==', nik).get();
+    if (snapshot.empty) {
+      return res.status(404).json({ message: 'Visit not found!' });
+    }
+    const visit = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json({ message: 'Visit retrieved successfully!', visit });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to retrieve visit', error: error.message });
   }
-
-  res.json({ message: 'Visit retrieved successfully!', visit });
 };
 
 // Scan RFID to get visit uuid
-exports.scanRFID = (req, res) => {
+exports.scanRFID = async (req, res) => {
   const { rfid_uid } = req.body;
+  try {
+    const guestSnapshot = await guestCollection.where('rfid_uid', '==', rfid_uid).get();
+    if (guestSnapshot.empty) {
+      return res.status(404).json({ message: 'Guest not found! Please register the RFID UID first.' });
+    }
 
-  // Cari tamu berdasarkan RFID UID
-  const guest = guestStore.find(item => item.rfid_uid === rfid_uid);
+    const guest = guestSnapshot.docs[0].data();
 
-  if (!guest) {
-    return res.status(404).json({ message: 'Guest not found! Please register the RFID UID first.' });
+    const newVisit = {
+      nik: guest.nik,
+      nama: guest.nama,
+      instansi: guest.instansi,
+      keperluan: '-',
+      jam_in: new Date().toTimeString().split(' ')[0],
+      jam_out: '-',
+      tanggal: new Date().toISOString().split('T')[0],
+      no_kartu: '-',
+      kendaraan_tamu: '-',
+      plat_kendaraan: '-',
+      security_induction: 'belum',
+      ttd: '-',
+      rfid_uid: guest.rfid_uid,
+    };
+
+    // Menambahkan kunjungan baru ke Firestore dan ambil id dokumen
+    const visitDocRef = await visitCollection.add(newVisit);
+
+    res.json({
+      message: 'RFID scanned successfully and visit added!',
+      visitDetails: { id: visitDocRef.id, ...newVisit },
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to add visit', error: error.message });
   }
-
-  // Generate visit id
-  const id = uuidv4();
-
-  // Auto-generate tanggal dan jam_in
-  const currentDateTime = new Date();
-  const tanggal = currentDateTime.toISOString().split('T')[0]; // Format YYYY-MM-DD
-  const jam_in = currentDateTime.toTimeString().split(' ')[0]; // Format HH:MM:SS
-
-  // Tambahkan kunjungan baru ke visitStore
-  const newVisit = {
-    id, // UUID untuk kunjungan
-    nik: guest.nik,
-    nama: guest.nama,
-    instansi: guest.instansi,
-    keperluan: "-", // Default, bisa diisi kemudian
-    jam_in: jam_in,
-    jam_out: "-", // Default
-    tanggal: tanggal,
-    no_kartu: "-", // Default
-    kendaraan_tamu: "-", // Default
-    plat_kendaraan: "-", // Default
-    security_induction: "belum", // Default
-    ttd: "-", // Default
-    rfid_uid: guest.rfid_uid // Menambahkan rfid_uid
-  };
-
-  visitStore.push(newVisit); // Tambahkan ke visitStore
-
-  res.json({
-    message: 'RFID scanned successfully and visit added!',
-    visitDetails: newVisit
-  });
 };
 
 // Add or Edit Visit Data
-exports.addVisit = (req, res) => {
-  const { id } = req.params; // Ambil id dari parameter
+exports.addVisit = async (req, res) => {
+  const { id } = req.params;
   const { keperluan, no_kartu, kendaraan_tamu, plat_kendaraan, security_induction } = req.body;
 
-  // Cari data visit berdasarkan id
-  const visitIndex = visitStore.findIndex(item => item.id === id);
+  try {
+    const visitRef = visitCollection.doc(id);
+    const visitDoc = await visitRef.get();
 
-  if (visitIndex === -1) {
-    return res.status(404).json({ message: 'Visit not found! Please ensure the id is correct.' });
+    if (!visitDoc.exists) {
+      return res.status(404).json({ message: 'Visit not found!' });
+    }
+
+    const updatedData = {
+      keperluan: keperluan || visitDoc.data().keperluan,
+      no_kartu: no_kartu || visitDoc.data().no_kartu,
+      kendaraan_tamu: kendaraan_tamu || visitDoc.data().kendaraan_tamu,
+      plat_kendaraan: plat_kendaraan || visitDoc.data().plat_kendaraan,
+      security_induction: security_induction || visitDoc.data().security_induction,
+    };
+
+    await visitRef.update(updatedData);
+
+    res.status(200).json({ message: 'Visit updated successfully!', updatedVisit: updatedData });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update visit', error: error.message });
   }
-
-  // Update data visit
-  visitStore[visitIndex] = {
-    ...visitStore[visitIndex], // Salin data yang ada
-    keperluan: keperluan || visitStore[visitIndex].keperluan, // Perbarui jika ada input
-    no_kartu: no_kartu || visitStore[visitIndex].no_kartu, // Perbarui jika ada input
-    kendaraan_tamu: kendaraan_tamu || visitStore[visitIndex].kendaraan_tamu, // Perbarui jika ada input
-    plat_kendaraan: plat_kendaraan || visitStore[visitIndex].plat_kendaraan, // Perbarui jika ada input
-    security_induction: security_induction || visitStore[visitIndex].security_induction // Perbarui jika ada input
-  };
-
-  res.status(200).json({
-    message: 'Visit updated successfully!',
-    updatedVisit: visitStore[visitIndex]
-  });
 };
 
-// Function to edit jam_out using RFID UID
-exports.editJamOut = (req, res) => {
-  const { rfid_uid } = req.body; // Ambil rfid_uid dari body
+// Update jam_out using RFID UID
+exports.editJamOut = async (req, res) => {
+  const { rfid_uid } = req.body;
+  try {
+    const snapshot = await visitCollection
+      .where('rfid_uid', '==', rfid_uid)
+      .where('jam_out', '==', '-')
+      .get();
 
-  // Cari data visit berdasarkan rfid_uid dengan jam_out "-"
-  const visitIndex = visitStore.findIndex(
-    item => item.rfid_uid === rfid_uid && item.jam_out === "-"
-  );
+    if (snapshot.empty) {
+      return res.status(404).json({
+        message: 'No visit found with the provided RFID UID and jam_out "-"!',
+      });
+    }
 
-  if (visitIndex === -1) {
-    return res.status(404).json({ 
-      message: 'No visit found with the provided RFID UID and jam_out "-"!' 
-    });
+    const visitDoc = snapshot.docs[0];
+    await visitDoc.ref.update({ jam_out: new Date().toTimeString().split(' ')[0] });
+
+    res.status(200).json({ message: 'Jam out updated successfully!', updatedVisit: visitDoc.data() });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update jam_out', error: error.message });
   }
-
-  // Update jam_out ke waktu saat ini
-  const currentTime = new Date().toTimeString().split(' ')[0]; // Format HH:MM:SS
-  visitStore[visitIndex].jam_out = currentTime;
-
-  res.status(200).json({
-    message: 'Jam out updated successfully!',
-    updatedVisit: visitStore[visitIndex]
-  });
 };
 
 // Delete visit
-exports.deleteVisit = (req, res) => {
+exports.deleteVisit = async (req, res) => {
   const { id } = req.params;
+  try {
+    const visitRef = visitCollection.doc(id);
+    const visitDoc = await visitRef.get();
 
-  const index = visitStore.findIndex(item => item.id === id);
+    if (!visitDoc.exists) {
+      return res.status(404).json({ message: 'Visit not found!' });
+    }
 
-  if (index === -1) {
-    return res.status(404).json({ message: 'Visit not found!' });
+    await visitRef.delete();
+
+    res.json({ message: 'Visit deleted successfully!', deletedVisit: visitDoc.data() });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete visit', error: error.message });
   }
-
-  const deletedVisit = visitStore.splice(index, 1); // Remove visit from the array
-  res.json({
-    message: 'Visit deleted successfully!',
-    deletedVisit,
-  });
 };

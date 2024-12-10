@@ -1,20 +1,23 @@
-// controllers/authController.js
 const jwt = require('jsonwebtoken');
-require('dotenv').config();  // Mengimpor dotenv untuk mengakses .env
-
-const users = [
-    { username: 'admin', password: 'admin12345' },
-    { username: 'admin2', password: 'admin67890' }
-];
+const firestore = require('../config/firestore'); // Import konfigurasi Firestore
+require('dotenv').config();
 
 // Fungsi untuk login dan menghasilkan token JWT
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
     const { username, password } = req.body;
 
-    // Mencari user berdasarkan username dan password
-    const user = users.find(u => u.username === username && u.password === password);
+    try {
+        // Mencari user berdasarkan username di Firestore
+        const userRef = firestore.collection('users');
+        const snapshot = await userRef.where('username', '==', username).where('password', '==', password).get();
 
-    if (user) {
+        if (snapshot.empty) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        // User ditemukan
+        const user = snapshot.docs[0].data();
+
         // Membuat payload untuk JWT
         const payload = {
             username: user.username
@@ -34,8 +37,9 @@ exports.login = (req, res) => {
         return res.status(200).json({
             message: 'Login successful',
         });
-    } else {
-        return res.status(401).json({ message: 'Invalid username or password' });
+    } catch (error) {
+        console.error('Error during login:', error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
