@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
 const Tesseract = require('tesseract.js');
-const firestore = require('../config/firestore'); // Import Firestore instance
+const firestore = require('../config/firestore'); // Import Firestore instancez
 
 const guestCollection = firestore.collection('guests'); // Nama koleksi Firestore
 
@@ -66,6 +66,22 @@ exports.scanKTP = async (req, res) => {
     console.log('Cleaned NIK:', nik);
     console.log('Extracted Name:', nama);
 
+    if (!nik) {
+      return res.status(400).json({ message: 'NIK not found in the image' });
+    }
+
+    // Ganti nama file menjadi NIK
+    const extension = path.extname(imagePath); // Ambil ekstensi file (misal .jpg, .png)
+    const newImagePath = path.join(path.dirname(imagePath), `${nik}${extension}`);
+
+    // Rename file
+    fs.rename(imagePath, newImagePath, (err) => {
+      if (err) {
+        console.error('Error renaming file:', err);
+        return res.status(500).json({ message: 'Failed to rename file', error: err.message });
+      }
+    });
+
     // Cek apakah NIK sudah ada di Firestore
     const existingSnapshot = await guestCollection.where('nik', '==', nik).get();
     if (!existingSnapshot.empty) {
@@ -86,11 +102,6 @@ exports.scanKTP = async (req, res) => {
     // Tambahkan tamu baru ke Firestore
     const newDoc = await guestCollection.add(newGuest);
 
-    // Hapus file yang telah diproses
-    fs.unlink(imagePath, (err) => {
-      if (err) console.error('Error deleting file:', err);
-    });
-
     res.status(200).json({
       message: 'KTP scanned and guest added successfully!',
       extractedText: text,
@@ -102,14 +113,6 @@ exports.scanKTP = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
-    // Hapus file jika terjadi kesalahan
-    if (req.file && req.file.path) {
-      fs.unlink(req.file.path, (err) => {
-        if (err) console.error('Error deleting file:', err);
-      });
-    }
-
     res.status(500).json({ message: 'An error occurred while scanning KTP.', error: error.message });
   }
 };
@@ -127,11 +130,27 @@ exports.updateGuestById = async (req, res) => {
       return res.status(404).json({ message: 'Guest not found!' });
     }
 
+    const oldNik = guestSnapshot.data().nik;
+
     // Validasi untuk memastikan NIK unik
-    if (nik && nik !== guestSnapshot.data().nik) {
+    if (nik && nik !== oldNik) {
       const nikSnapshot = await guestCollection.where('nik', '==', nik).get();
       if (!nikSnapshot.empty) {
         return res.status(400).json({ message: 'NIK already registered to another guest!' });
+      }
+
+      // Jika NIK berubah, ganti nama file gambar sesuai NIK yang baru
+      const oldImagePath = path.join('uploads', `${oldNik}.jpg`); // Pastikan formatnya sesuai
+      const newImagePath = path.join('uploads', `${nik}.jpg`);
+
+      // Rename file jika perlu
+      if (fs.existsSync(oldImagePath)) {
+        fs.rename(oldImagePath, newImagePath, (err) => {
+          if (err) {
+            console.error('Error renaming file:', err);
+            return res.status(500).json({ message: 'Failed to rename file', error: err.message });
+          }
+        });
       }
     }
 
@@ -154,6 +173,7 @@ exports.updateGuestById = async (req, res) => {
     res.status(500).json({ message: 'Failed to update guest', error: error.message });
   }
 };
+
 
 // Update RFID by NIK
 exports.updateRFIDByNIK = async (req, res) => {
@@ -194,8 +214,23 @@ exports.deleteGuest = async (req, res) => {
       return res.status(404).json({ message: 'Guest not found!' });
     }
 
+    // Menghapus data tamu dari Firestore
     await snapshot.docs[0].ref.delete();
-    res.json({ message: 'Guest deleted successfully!' });
+
+    // Path gambar yang sesuai dengan NIK
+    const imagePath = path.join('uploads', `${nik}.jpg`);
+
+    // Mengecek apakah file gambar ada dan menghapusnya
+    if (fs.existsSync(imagePath)) {
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error('Error deleting image:', err);
+          return res.status(500).json({ message: 'Failed to delete image', error: err.message });
+        }
+      });
+    }
+
+    res.json({ message: 'Guest and associated image deleted successfully!' });
   } catch (error) {
     console.error('Error deleting guest:', error);
     res.status(500).json({ message: 'Failed to delete guest', error: error.message });
