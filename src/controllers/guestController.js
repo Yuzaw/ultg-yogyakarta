@@ -2,7 +2,8 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
 const Tesseract = require('tesseract.js');
-const firestore = require('../config/firestore'); // Import Firestore instancez
+const firestore = require('../config/firestore');
+const bucket = require('../config/storage');
 
 const guestCollection = firestore.collection('guests'); // Nama koleksi Firestore
 
@@ -75,41 +76,64 @@ exports.scanKTP = async (req, res) => {
     const newImagePath = path.join(path.dirname(imagePath), `${nik}${extension}`);
 
     // Rename file
-    fs.rename(imagePath, newImagePath, (err) => {
+    fs.rename(imagePath, newImagePath, async (err) => {
       if (err) {
         console.error('Error renaming file:', err);
         return res.status(500).json({ message: 'Failed to rename file', error: err.message });
       }
-    });
 
-    // Cek apakah NIK sudah ada di Firestore
-    const existingSnapshot = await guestCollection.where('nik', '==', nik).get();
-    if (!existingSnapshot.empty) {
-      return res.status(400).json({
-        message: 'NIK already registered!',
-        guest: existingSnapshot.docs[0].data(),
+      // Upload file gambar ke Google Cloud Storage
+      const blob = bucket.file(`${nik}${extension}`);
+      const blobStream = blob.createWriteStream({
+        resumable: false,
+        metadata: {
+          contentType: req.file.mimetype, // Set content type sesuai dengan file yang di-upload
+        },
       });
-    }
 
-    // Jika NIK belum terdaftar, buat data tamu baru
-    const newGuest = {
-      nik,
-      nama,
-      instansi: 'Unknown', // Default value for instansi
-      rfid_uid: null, // Set RFID UID awal ke null
-    };
+      fs.createReadStream(newImagePath)
+        .pipe(blobStream)
+        .on('finish', async () => {
+          console.log('File uploaded to Cloud Storage');
+          
+          // Hapus file lokal setelah upload
+          fs.unlinkSync(newImagePath);
 
-    // Tambahkan tamu baru ke Firestore
-    const newDoc = await guestCollection.add(newGuest);
+          // Cek apakah NIK sudah ada di Firestore
+          const existingSnapshot = await guestCollection.where('nik', '==', nik).get();
+          if (!existingSnapshot.empty) {
+            return res.status(400).json({
+              message: 'NIK already registered!',
+              guest: existingSnapshot.docs[0].data(),
+            });
+          }
 
-    res.status(200).json({
-      message: 'KTP scanned and guest added successfully!',
-      extractedText: text,
-      extractedData: {
-        nik: nik || 'NIK not found',
-        nama: nama || 'Name not found',
-      },
-      newGuest: { id: newDoc.id, ...newGuest },
+          // Jika NIK belum terdaftar, buat data tamu baru
+          const newGuest = {
+            nik,
+            nama,
+            instansi: 'Unknown', // Default value for instansi
+            rfid_uid: null, // Set RFID UID awal ke null
+            imageUrl: `https://storage.googleapis.com/${bucket.name}/${nik}${extension}`, // URL gambar yang disimpan di cloud
+          };
+
+          // Tambahkan tamu baru ke Firestore
+          const newDoc = await guestCollection.add(newGuest);
+
+          res.status(200).json({
+            message: 'KTP scanned and guest added successfully!',
+            extractedText: text,
+            extractedData: {
+              nik: nik || 'NIK not found',
+              nama: nama || 'Name not found',
+            },
+            newGuest: { id: newDoc.id, ...newGuest },
+          });
+        })
+        .on('error', (err) => {
+          console.error('Error uploading file:', err);
+          return res.status(500).json({ message: 'Failed to upload image to Cloud Storage', error: err.message });
+        });
     });
   } catch (error) {
     console.error(error);
@@ -139,41 +163,52 @@ exports.updateGuestById = async (req, res) => {
         return res.status(400).json({ message: 'NIK already registered to another guest!' });
       }
 
-      // Jika NIK berubah, ganti nama file gambar sesuai NIK yang baru
-      const oldImagePath = path.join('uploads', `${oldNik}.jpg`); // Pastikan formatnya sesuai
-      const newImagePath = path.join('uploads', `${nik}.jpg`);
+      // Jika NIK berubah, ganti nama file gambar sesuai NIK yang baru di Google Cloud Storage
+      const oldFile = bucket.file(`${oldNik}.jpg`);
+      const newFile = bucket.file(`${nik}.jpg`);
 
-      // Rename file jika perlu
-      if (fs.existsSync(oldImagePath)) {
-        fs.rename(oldImagePath, newImagePath, (err) => {
-          if (err) {
-            console.error('Error renaming file:', err);
-            return res.status(500).json({ message: 'Failed to rename file', error: err.message });
-          }
-        });
-      }
+      // Copy file ke nama baru
+      await oldFile.copy(newFile);
+
+      // Hapus file lama setelah berhasil disalin
+      await oldFile.delete();
+
+      // Update data tamu di Firestore
+      const updatedGuest = {
+        ...guestSnapshot.data(),
+        nik: nik || guestSnapshot.data().nik,
+        nama: nama || guestSnapshot.data().nama,
+        instansi: instansi || guestSnapshot.data().instansi,
+        imageUrl: `https://storage.googleapis.com/${bucket.name}/${nik}.jpg`, // Update URL gambar
+      };
+
+      await guestRef.set(updatedGuest);
+
+      res.json({
+        message: 'Guest updated successfully!',
+        updatedGuest,
+      });
+    } else {
+      // Update tamu tanpa mengganti NIK
+      const updatedGuest = {
+        ...guestSnapshot.data(),
+        nik: nik || guestSnapshot.data().nik,
+        nama: nama || guestSnapshot.data().nama,
+        instansi: instansi || guestSnapshot.data().instansi,
+      };
+
+      await guestRef.set(updatedGuest);
+
+      res.json({
+        message: 'Guest updated successfully!',
+        updatedGuest,
+      });
     }
-
-    // Perbarui data tamu
-    const updatedGuest = {
-      ...guestSnapshot.data(),
-      nik: nik || guestSnapshot.data().nik,
-      nama: nama || guestSnapshot.data().nama,
-      instansi: instansi || guestSnapshot.data().instansi,
-    };
-
-    await guestRef.set(updatedGuest);
-
-    res.json({
-      message: 'Guest updated successfully!',
-      updatedGuest,
-    });
   } catch (error) {
     console.error('Error updating guest:', error);
     res.status(500).json({ message: 'Failed to update guest', error: error.message });
   }
 };
-
 
 // Update RFID by NIK
 exports.updateRFIDByNIK = async (req, res) => {
@@ -217,18 +252,11 @@ exports.deleteGuest = async (req, res) => {
     // Menghapus data tamu dari Firestore
     await snapshot.docs[0].ref.delete();
 
-    // Path gambar yang sesuai dengan NIK
-    const imagePath = path.join('uploads', `${nik}.jpg`);
+    // Path gambar yang sesuai dengan NIK di Google Cloud Storage
+    const imageFile = bucket.file(`${nik}.jpg`);
 
-    // Mengecek apakah file gambar ada dan menghapusnya
-    if (fs.existsSync(imagePath)) {
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.error('Error deleting image:', err);
-          return res.status(500).json({ message: 'Failed to delete image', error: err.message });
-        }
-      });
-    }
+    // Menghapus file gambar dari Google Cloud Storage
+    await imageFile.delete();
 
     res.json({ message: 'Guest and associated image deleted successfully!' });
   } catch (error) {
