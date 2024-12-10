@@ -111,7 +111,7 @@ exports.scanRFID = (req, res) => {
 // Add or Edit Visit Data
 exports.addVisit = (req, res) => {
   const { id } = req.params; // Ambil id dari parameter
-  const { keperluan, no_kartu, kendaraan_tamu, plat_kendaraan } = req.body;
+  const { keperluan, no_kartu, kendaraan_tamu, plat_kendaraan, security_induction } = req.body;
 
   // Cari data visit berdasarkan id
   const visitIndex = visitStore.findIndex(item => item.id === id);
@@ -126,7 +126,8 @@ exports.addVisit = (req, res) => {
     keperluan: keperluan || visitStore[visitIndex].keperluan, // Perbarui jika ada input
     no_kartu: no_kartu || visitStore[visitIndex].no_kartu, // Perbarui jika ada input
     kendaraan_tamu: kendaraan_tamu || visitStore[visitIndex].kendaraan_tamu, // Perbarui jika ada input
-    plat_kendaraan: plat_kendaraan || visitStore[visitIndex].plat_kendaraan // Perbarui jika ada input
+    plat_kendaraan: plat_kendaraan || visitStore[visitIndex].plat_kendaraan, // Perbarui jika ada input
+    security_induction: security_induction || visitStore[visitIndex].security_induction // Perbarui jika ada input
   };
 
   res.status(200).json({
