@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
         // Menyimpan token dalam cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true
+            secure: false //ubah true buat https
         });
 
         // Mengirimkan respons login berhasil
@@ -47,7 +47,7 @@ exports.logout = (req, res) => {
     // Menghapus token dari cookie
     res.clearCookie('token', {
         httpOnly: true,  // Hanya dapat diakses melalui HTTP request
-        secure: process.env.NODE_ENV === 'production', // Hanya untuk HTTPS di production
+        secure: false // ubah true buat https
     });
 
     // Mengirimkan respons logout berhasil
