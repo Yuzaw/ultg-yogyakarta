@@ -28,9 +28,8 @@ exports.login = async (req, res) => {
 
         // Menyimpan token dalam cookie
         res.cookie('token', token, {
-            httpOnly: true,  // Hanya dapat diakses melalui HTTP request
-            secure: process.env.NODE_ENV === 'production', // Hanya untuk HTTPS di production
-            maxAge: 3600000   // 1 jam
+            httpOnly: true,
+            secure: true
         });
 
         // Mengirimkan respons login berhasil
