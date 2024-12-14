@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const corsMiddleware = require('./middlewares/cors');
 const apiRoutes = require('./routes/api');
+const clientRoutes = require('./routes/client');
 
 const app = express();
 const PORT = 5000;
@@ -10,13 +11,10 @@ const PORT = 5000;
 app.use(corsMiddleware);
 app.use(express.json());
 app.use(cookieParser()); 
-
-// Route utama untuk cek server
-app.get('/', (req, res) => {
-  res.send('Server Connected');
-});
+app.use(express.static('public'));
 
 // Routes
+app.use('/', clientRoutes);
 app.use('/api', apiRoutes); // Prefix semua routes dengan /api
 
 // Jalankan server

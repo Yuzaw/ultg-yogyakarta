@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visit Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .error-message {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Visit Data</h1>
+  <div id="visit-container">
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>NIK</th>
+          <th>Nama</th>
+          <th>Instansi</th>
+          <th>Keperluan</th>
+          <th>Jam In</th>
+          <th>Jam Out</th>
+          <th>Tanggal</th>
+          <th>RFID UID</th>
+        </tr>
+      </thead>
+      <tbody id="visit-list">
+        <!-- Data akan dimasukkan di sini oleh JavaScript -->
+      </tbody>
+    </table>
+    <div id="error" class="error-message"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', fetchVisits);
+
+    async function fetchVisits() {
+      const visitList = document.getElementById('visit-list');
+      const errorDiv = document.getElementById('error');
+
+      try {
+        // Ambil data visit dari backend
+        const response = await fetch('/api/visits'); // Pastikan route sesuai dengan API
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to fetch visits');
+        }
+
+        const visits = result.visits;
+
+        // Periksa jika tidak ada data
+        if (visits.length === 0) {
+          visitList.innerHTML = '<tr><td colspan="9">No visit data found.</td></tr>';
+          return;
+        }
+
+        // Render data visit ke tabel
+        visitList.innerHTML = visits
+          .map((visit, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${visit.nik}</td>
+              <td>${visit.nama}</td>
+              <td>${visit.instansi}</td>
+              <td>${visit.keperluan}</td>
+              <td>${visit.jam_in}</td>
+              <td>${visit.jam_out}</td>
+              <td>${visit.tanggal}</td>
+              <td>${visit.rfid_uid}</td>
+            </tr>
+          `)
+          .join('');
+      } catch (error) {
+        console.error('Error fetching visits:', error);
+        errorDiv.textContent = 'Error: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
