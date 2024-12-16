@@ -158,6 +158,6 @@ exports.downloadVisits = async (req, res, next) => {
     // Use the middleware function to convert JSON to CSV and send the file with the dynamic filename
     res.jsonToCsv(visits, fileName); // Calls the middleware method
   } catch (error) {
-    next(error); // Pass the error to the next middleware (error handler)
+    res.status(500).json({ message: 'Failed to retrieve visits', error: error.message });
   }
 };
