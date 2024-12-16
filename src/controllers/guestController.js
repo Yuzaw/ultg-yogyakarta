@@ -266,9 +266,9 @@ exports.downloadGuests = async (req, res) => {
   try {
     const snapshot = await guestCollection.get();
     if (snapshot.empty) {
-      return res.status(404).json({ message: 'No visits found' });
+      return res.status(404).json({ message: 'No guests found' });
     }
-    
+
     const guests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     // Specify the file name dynamically
