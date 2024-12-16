@@ -1,0 +1,117 @@
+<html>
+ <head>
+  <title>
+   PLN ULTG Yogyakarta
+  </title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #0d0d2b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-image: url('../images/background.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 60px;
+            margin-bottom: 0.5em;
+        }
+        p {
+            font-size: 30px;
+            margin-bottom: 2em;
+        }
+        .options {
+            display: flex;
+            gap: 2em;
+            justify-content: center;
+        }
+        .option {
+            background-color: #4b0082;
+            padding: 50px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            transition: transform 0.3s;
+            text-decoration: none;
+            color: white;
+        }
+        .option:hover {
+            transform: scale(1.05);
+        }
+        .option img {
+            width: auto;
+            height: 150px;
+            margin-bottom: 1em;
+        }
+        .option p {
+            font-size: 40px;
+            margin: 0;
+        }
+        .option:nth-child(2) {
+            background-color: #0000ff;
+        }
+        .option:nth-child(3) {
+            background-color: #ff4500;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .options {
+                flex-direction: column;
+                gap: 1em;
+            }
+            .option {
+                width: 100%;
+            }
+        }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <h1>
+    Selamat Datang di PLN ULTG Yogyakarta
+   </h1>
+   <p>
+    Silahkan pilih menu yang ada di bawah ini
+   </p>
+   <div class="options">
+    <!-- Card pertama, link ke halaman daftar -->
+    <a href="/register" class="option">
+     <img alt="Camera Icon" height="100" src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon1.png?authuser=1" width="100"/>
+     <p>
+      Pertama kali mengunjungi PLN ULTG Yogyakarta
+     </p>
+    </a>
+    <!-- Card kedua, link ke halaman masuk -->
+    <a href="/in" class="option">
+     <img alt="Card Icon" height="100" src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" width="100"/>
+     <p>
+      Sudah pernah mengunjungi PLN ULTG Yogyakarta
+     </p>
+    </a>
+    <!-- Card ketiga, link ke halaman keluar kunjungan -->
+    <a href="/out" class="option">
+     <img alt="Exit Icon" height="100" src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon3.png?authuser=1" width="100"/>
+     <p>
+      Keluar dari kunjungan
+     </p>
+    </a>
+   </div>
+  </div>
+ </body>
+</html>

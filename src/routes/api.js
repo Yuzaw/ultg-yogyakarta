@@ -5,6 +5,7 @@ const authController = require('../controllers/authController');
 const visitController = require('../controllers/visitController');
 const authToken = require('../middlewares/authToken');
 const upload = require('../middlewares/upload');
+const convertJsonToCsv = require('../middlewares/csv');
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.post('/guests/scan', authToken, upload.single('image'), guestController.s
 router.put('/guests/:id', authToken, guestController.updateGuestById);
 router.put('/guests/:nik/rfid', authToken, guestController.updateRFIDByNIK);
 router.delete('/guests/:nik/delete', authToken, guestController.deleteGuest);
+router.get('/download-guests', authToken, convertJsonToCsv, guestController.downloadGuests);
 
 // Visit Routes
 router.get('/visits', authToken, visitController.getAllVisits);
@@ -27,5 +29,6 @@ router.post('/visits/scan', authToken, visitController.scanRFID);
 router.put('/visits/:id/add', authToken, visitController.addVisit);
 router.put('/visits/out', authToken, visitController.editJamOut);
 router.delete('/visits/:id/delete', authToken, visitController.deleteVisit);
+router.get('/download-visits', authToken, convertJsonToCsv, visitController.downloadVisits);
 
 module.exports = router;

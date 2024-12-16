@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scanKTP</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP" defer></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <section class="scan-ktp">
+            <div class="scan-ktp-container">
+                <h2>Scan Masuk</h2>
+                <p>Scan KTP anda, Mohon lengkapi data di bawah ini:</p>
+                
+                <div class="scan-ktp-image">
+                    <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP anda">
+                </div>
+                
+                <!-- New Scan Button -->
+                <div class="scan-button-container">
+                    <button id="scanButton" class="scan-button">Mulai Scan</button>
+                </div>
+                
+                <!-- Scanning animation -->
+                <div id="scanningText" class="scanning-text"></div>
+                
+                <!-- Success message -->
+                <div id="successMessage" class="success-message"></div>
+                
+                <form class="scan-ktp-form">
+                    <!-- Keperluan & No. Kartu Sejajar -->
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="keperluan">Keperluan:</label>
+                            <input type="text" id="keperluan" name="keperluan" placeholder="Keperluan">
+                        </div>
+                        <div class="form-group">
+                            <label for="noKartu">No. Kartu:</label>
+                            <input type="text" id="noKartu" name="noKartu" placeholder="No. Kartu">
+                        </div>
+                    </div>
+        
+                    <!-- Kendaraan & Plat Kendaraan -->
+                    <div class="form-group">
+                        <label for="kendaraan">Kendaraan (Isi “-” Jika Tidak Ada):</label>
+                        <input type="text" id="kendaraan" name="kendaraan" placeholder="Kendaraan">
+                    </div>
+                    <div class="form-group">
+                        <label for="platKendaraan">Plat Kendaraan (Isi “-” Jika Tidak Ada):</label>
+                        <input type="text" id="platKendaraan" name="platKendaraan" placeholder="Plat Kendaraan">
+                    </div>
+        
+                    <!-- Radio Button for Security Induction -->
+                    <div class="form-group-radio">
+                        <label for="securityInduction">Tanda Tangan:</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="security-induction" value="Sudah" />
+                                Sudah
+                            </label>
+                            <label>
+                                <input type="radio" name="security-induction" value="Belum" />
+                                Belum
+                            </label>
+                        </div>
+                    </div>
+        
+                    <!-- Submit Button -->
+                    <div class="button">
+                        <button type="submit">Kirim</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+
+<style>
+    .scan-button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .scan-button {
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: #6c63ff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .scan-button:hover {
+        background-color: #574bcd;
+    }
+
+    .scanning-text {
+        font-size: 24px;
+        color: #6c63ff;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .success-message {
+        font-size: 24px;
+        color: green;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+<script>
+   const scanButton = document.getElementById('scanButton');
+        const scanningText = document.getElementById('scanningText');
+        let isScanning = false;
+
+        scanButton.addEventListener('click', () => {
+            if (!isScanning) {
+                isScanning = true;
+                scanningText.textContent = '';
+                let i = 0;
+                const text = 'SCANNING';
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        scanningText.textContent += text[i];
+                        i++;
+                    } else {
+                        scanningText.textContent = '';
+                        i = 0;
+                    }
+                }, 200);
+
+                // Simulate receiving an RFID signal from the backend
+                setTimeout(() => {
+                    clearInterval(interval);
+                    scanningText.textContent = 'SCANNING SUCCESSFUL';
+                    isScanning = false;
+                }, 5000); // Simulate a 5-second scan process
+            }
+        });
+</script>
+</html>

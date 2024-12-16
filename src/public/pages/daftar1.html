@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Management</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP" defer></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Daftar Tamu Baru</h1>
+
+
+            <div id="imagePreview" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <img id="previewImg" src="" alt="Preview Gambar" style="width: 100%; max-width: 400px; border-radius: 8px; display: none;"/>
+            </div>
+            
+
+
+            <input type="file" id="imageInput" accept="image/*" />
+            <button id="uploadButton">Scan KTP with OCR</button>
+            
+
+            <form id="guestForm">
+                <input type="hidden" id="guestId" />
+
+                <div class="form-group">
+                    <label for="nik">NIK:</label>
+                    <input type="text" id="nikInput" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="nama">Nama:</label>
+                    <input type="text" id="namaInput" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="instansi">Instansi/Alamat:</label>
+                    <input type="text" id="instansiInput" />
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" id="saveButton">Daftar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="/scripts/APP"></script>
+</body>
+</html>

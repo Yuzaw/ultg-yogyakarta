@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scanKTP</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP"></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <section class="scan-keluar">
+            <div class="scan-keluar-container">
+                <h2>Scan Keluar</h2>
+                <p>Scan KTP anda untuk keluar, Mohon lengkapi data di bawah ini:</p>
+                
+                <!-- Gambar Scan -->
+                <div class="scan-keluar-image">
+                    <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP anda">
+                </div>
+                
+                <!-- Teks Berjajar ke Bawah -->
+                <div class="scan-keluar-text">
+                    <p><strong>Nama:</strong> [Isi Nama]</p>
+                    <p><strong>Instansi:</strong> [Isi Instansi]</p>
+                    <p><strong>Jam Keluar:</strong> [Isi Jam Keluar]</p>
+                </div>
+
+
+                <div class="form-group-radio-keluar">
+                    <label for="securityInduction">Security Induction:</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="security-induction" value="Sudah" />
+                            Sudah
+                        </label>
+                        <label>
+                            <input type="radio" name="security-induction" value="Belum" />
+                            Belum
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button">
+                    <button type="submit">
+                        Selesai
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scanKTP</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src= "/scripts/include" defer></script>
+    <script src="/scripts/mainAPP"></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <section class="scan-ktp">
+            <div class="scan-ktp-container">
+                <h2>Scan Masuk</h2>
+                <p>Scan KTP anda, Mohon lengkapi data di bawah ini:</p>
+                <div class="can-ktp-image">
+                    <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP anda">
+                </div>
+                
+                <form class="scan-ktp-form">
+                    <!-- Keperluan & No. Kartu Sejajar -->
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="keperluan">Keperluan:</label>
+                            <input type="text" id="keperluan" name="keperluan" placeholder="Keperluan">
+                        </div>
+                        <div class="form-group">
+                            <label for="noKartu">No. Kartu:</label>
+                            <input type="text" id="noKartu" name="noKartu" placeholder="No. Kartu">
+                        </div>
+                    </div>
+        
+                    <!-- Kendaraan & Plat Kendaraan -->
+                    <div class="form-group">
+                        <label for="kendaraan">Kendaraan (Isi “-” Jika Tidak Ada):</label>
+                        <input type="text" id="kendaraan" name="kendaraan" placeholder="Kendaraan">
+                    </div>
+                    <div class="form-group">
+                        <label for="platKendaraan">Plat Kendaraan (Isi “-” Jika Tidak Ada):</label>
+                        <input type="text" id="platKendaraan" name="platKendaraan" placeholder="Plat Kendaraan">
+                    </div>
+        
+                    <!-- Radio Button for Security Induction -->
+                    <div class="form-group-radio">
+                        <label for="securityInduction">Tanda Tangan:</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="security-induction" value="Sudah" />
+                                Sudah
+                            </label>
+                            <label>
+                                <input type="radio" name="security-induction" value="Belum" />
+                                Belum
+                            </label>
+                        </div>
+                        
+                    </div>
+        
+                    <!-- Submit Button -->
+                    <div class="button">
+                        <button type="submit">Kirim</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <div id="scanningLayer" class="scanning-layer hidden">
+            <div class="scanning-icon-container">
+                <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP">
+            </div>
+            <div class="scanning-text" id="scanningText">Scanning</div>
+            <div class="success-message hidden" id="successMessage">Successful</div>
+        </div>
+    </main>
+</body>
+</html>

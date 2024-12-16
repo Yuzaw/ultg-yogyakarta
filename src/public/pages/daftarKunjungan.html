@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src= "/scripts/include" defer></script>
+    <script src="/scripts/mainAPP"></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+    
+
+    <main class="content">
+        <div class="container-guest">
+            <h2>Lihat Daftar Kunjungan</h2>
+            <div class="button-download-kunjungan" id="button-download-kunjungan">
+                <button type="submit">
+                    Download
+                </button>
+            </div>
+            <div class="guest-table-container">
+                <table class="guest-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">NO</th>
+                            <th rowspan="2">TANGGAL</th>
+                            <th rowspan="2">NAMA</th>
+                            <th rowspan="2">INSTANSI / ALAMAT</th>
+                            <th rowspan="2">KEPERLUAN</th>
+                            <th rowspan="2">JAM (IN)</th>
+                            <th rowspan="2">JAM (OUT)</th>
+                            <th rowspan="2">IDENTITAS (KTP/SIM/L)</th>
+                            <th rowspan="2">NO. KARTU DAERAH BEBAS</th>
+                            <th colspan="3">KENDARAAN TAMU (JIKA ADA)</th>
+                            <th rowspan="2">SECURITY INDUCTION</th>
+                            <th rowspan="2">TTD</th>
+                        </tr>
+                        <tr>
+                            <th>NO KARTU</th>
+                            <th>NO. POL</th>
+                            <th>JENIS (R2/R4/L)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guest-list-body">
+                        <!-- Data kunjungan akan diisi secara dinamis -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        
+      </main>
+      <script src="/scripts/APP"></script>
+</body>
+</html>
