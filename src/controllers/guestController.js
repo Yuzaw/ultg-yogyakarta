@@ -57,19 +57,15 @@ exports.scanKTP = async (req, res) => {
 
     // Regex untuk menangkap NIK
     const nikMatch = text.match(/(?:NIK|Nik|nik)[^0-9]*([\d\s]{16,})/i); 
-    let nik = nikMatch ? nikMatch[1].replace(/\s+/g, '') : null;
+    let nik = nikMatch ? nikMatch[1].replace(/\s+/g, '') : 'nik_invalid';
 
     // Regex untuk menangkap Nama
     const namaMatch = text.match(/Nama(?:\s*:\s*|\s+)(.+)/i);
-    const nama = namaMatch ? namaMatch[1].trim() : null;
+    const nama = namaMatch ? namaMatch[1].trim() : 'nama_invalid';
 
     console.log('Extracted NIK (before cleaning):', nikMatch ? nikMatch[1] : 'not found');
     console.log('Cleaned NIK:', nik);
     console.log('Extracted Name:', nama);
-
-    if (!nik) {
-      return res.status(400).json({ message: 'NIK not found in the image' });
-    }
 
     // Ganti nama file menjadi NIK
     const extension = path.extname(imagePath); // Ambil ekstensi file (misal .jpg, .png)
@@ -114,7 +110,7 @@ exports.scanKTP = async (req, res) => {
             nama,
             instansi: 'Unknown', // Default value for instansi
             rfid_uid: null, // Set RFID UID awal ke null
-            imageUrl: `https://storage.googleapis.com/${bucket.name}/${nik}${extension}`, // URL gambar yang disimpan di cloud
+            imageUrl: `https://storage.googleapis.com/${bucket.name}/guests/${nik}${extension}`, // URL gambar yang disimpan di cloud
           };
 
           // Tambahkan tamu baru ke Firestore
@@ -124,8 +120,8 @@ exports.scanKTP = async (req, res) => {
             message: 'KTP scanned and guest added successfully!',
             extractedText: text,
             extractedData: {
-              nik: nik || 'NIK not found',
-              nama: nama || 'Name not found',
+              nik: nik,  // Will show 'nik_invalid' if not found
+              nama: nama, // Will show 'nama_invalid' if not found
             },
             newGuest: { id: newDoc.id, ...newGuest },
           });
@@ -140,6 +136,7 @@ exports.scanKTP = async (req, res) => {
     res.status(500).json({ message: 'An error occurred while scanning KTP.', error: error.message });
   }
 };
+
 
 // Update guest by ID
 exports.updateGuestById = async (req, res) => {
@@ -179,7 +176,7 @@ exports.updateGuestById = async (req, res) => {
         nik: nik || guestSnapshot.data().nik,
         nama: nama || guestSnapshot.data().nama,
         instansi: instansi || guestSnapshot.data().instansi,
-        imageUrl: `https://storage.googleapis.com/${bucket.name}/${nik}.jpg`, // Update URL gambar
+        imageUrl: `https://storage.googleapis.com/${bucket.name}/guests/${nik}.jpg`, // Update URL gambar
       };
 
       await guestRef.set(updatedGuest);
@@ -262,5 +259,20 @@ exports.deleteGuest = async (req, res) => {
   } catch (error) {
     console.error('Error deleting guest:', error);
     res.status(500).json({ message: 'Failed to delete guest', error: error.message });
+  }
+};
+
+exports.downloadGuests = async (req, res) => {
+  try {
+    const snapshot = await guestCollection.get();
+    const guests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Specify the file name dynamically
+    const fileName = `guests_data_${new Date().toISOString()}.csv`;
+
+    // Use the middleware function to send the CSV file with the dynamic filename
+    res.jsonToCsv(guests, fileName);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to retrieve guests', error: error.message });
   }
 };

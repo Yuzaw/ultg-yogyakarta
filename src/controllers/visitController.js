@@ -140,3 +140,24 @@ exports.deleteVisit = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete visit', error: error.message });
   }
 };
+
+// Download all visits as CSV
+exports.downloadVisits = async (req, res, next) => {
+  try {
+    const snapshot = await visitCollection.get(); // Fetch all visit data from Firestore
+    if (snapshot.empty) {
+      return res.status(404).json({ message: 'No visits found' });
+    }
+
+    // Map the Firestore documents to a simple array of visit data
+    const visits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Specify the file name dynamically
+    const fileName = `visits_data_${new Date().toISOString()}.csv`;
+
+    // Use the middleware function to convert JSON to CSV and send the file with the dynamic filename
+    res.jsonToCsv(visits, fileName); // Calls the middleware method
+  } catch (error) {
+    next(error); // Pass the error to the next middleware (error handler)
+  }
+};
