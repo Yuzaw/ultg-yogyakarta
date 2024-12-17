@@ -136,7 +136,6 @@ exports.scanKTP = async (req, res) => {
   }
 };
 
-
 // Update guest by ID
 exports.updateGuestById = async (req, res) => {
   const { id } = req.params;
@@ -151,6 +150,7 @@ exports.updateGuestById = async (req, res) => {
     }
 
     const oldNik = guestSnapshot.data().nik;
+    const oldExtension = path.extname(guestSnapshot.data().imageUrl); // Ambil ekstensi file lama dari URL gambar
 
     // Validasi untuk memastikan NIK unik
     if (nik && nik !== oldNik) {
@@ -160,8 +160,8 @@ exports.updateGuestById = async (req, res) => {
       }
 
       // Jika NIK berubah, ganti nama file gambar sesuai NIK yang baru di Google Cloud Storage
-      const oldFile = bucket.file(`${oldNik}.jpg`);
-      const newFile = bucket.file(`${nik}.jpg`);
+      const oldFile = bucket.file(`${oldNik}${oldExtension}`);
+      const newFile = bucket.file(`${nik}${oldExtension}`); // Gunakan ekstensi yang sama dengan file lama
 
       // Copy file ke nama baru
       await oldFile.copy(newFile);
@@ -175,7 +175,7 @@ exports.updateGuestById = async (req, res) => {
         nik: nik || guestSnapshot.data().nik,
         nama: nama || guestSnapshot.data().nama,
         instansi: instansi || guestSnapshot.data().instansi,
-        imageUrl: `https://storage.googleapis.com/${bucket.name}/guests/${nik}.jpg`, // Update URL gambar
+        imageUrl: `https://storage.googleapis.com/${bucket.name}/guests/${nik}${oldExtension}`, // Update URL gambar dengan ekstensi yang benar
       };
 
       await guestRef.set(updatedGuest);

@@ -1,58 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guest Management</title>
-    <link rel="stylesheet" href="/style/main">
-    <script src="/scripts/include" defer></script>
-    <script src="/scripts/mainAPP" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guest Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background: #34495e;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    video, img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    #previewImg {
+      display: none;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 10px 5px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .btn-container {
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div data-include="/navigation"></div>
-    </header>
+  <h1>Daftar Tamu Baru</h1>
 
-    <main>
-        <div class="container">
-            <h1>Daftar Tamu Baru</h1>
+  <div class="container">
+    <h2>Ambil Foto</h2>
+    <video id="camera" autoplay playsinline></video>
+    <img id="previewImg" src="" alt="Preview Gambar" />
+    <canvas id="canvas" style="display: none;"></canvas>
+    <div class="btn-container">
+      <button id="takePhotoButton">Take Foto</button>
+      <button id="retakePhotoButton" style="display: none;">Retake Foto</button>
+      <button id="scanKTPButton" disabled>Scan KTP</button>
+    </div>
 
+    <h2>Form Data Tamu</h2>
+    <form id="guestForm">
+      <input type="hidden" id="guestId" />
 
-            <div id="imagePreview" style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                <img id="previewImg" src="" alt="Preview Gambar" style="width: 100%; max-width: 400px; border-radius: 8px; display: none;"/>
-            </div>
-            
+      <div class="form-group">
+        <label for="nik">NIK:</label>
+        <input type="text" id="nikInput" required />
+      </div>
 
+      <div class="form-group">
+        <label for="nama">Nama:</label>
+        <input type="text" id="namaInput" required />
+      </div>
 
-            <input type="file" id="imageInput" accept="image/*" />
-            <button id="uploadButton">Scan KTP with OCR</button>
-            
+      <div class="form-group">
+        <label for="instansi">Instansi/Alamat:</label>
+        <input type="text" id="instansiInput" />
+      </div>
 
-            <form id="guestForm">
-                <input type="hidden" id="guestId" />
+      <div class="btn-container">
+        <button type="button" id="saveButton">Daftar</button>
+      </div>
+    </form>
+  </div>
 
-                <div class="form-group">
-                    <label for="nik">NIK:</label>
-                    <input type="text" id="nikInput" required />
-                </div>
+  <script>
+    const camera = document.getElementById('camera');
+    const previewImg = document.getElementById('previewImg');
+    const canvas = document.getElementById('canvas');
+    const takePhotoButton = document.getElementById('takePhotoButton');
+    const retakePhotoButton = document.getElementById('retakePhotoButton');
+    const scanKTPButton = document.getElementById('scanKTPButton');
+    const nikInput = document.getElementById('nikInput');
+    const namaInput = document.getElementById('namaInput');
+    const instansiInput = document.getElementById('instansiInput');
+    const guestIdInput = document.getElementById('guestId');
+    const saveButton = document.getElementById('saveButton');
 
-                <div class="form-group">
-                    <label for="nama">Nama:</label>
-                    <input type="text" id="namaInput" required />
-                </div>
+    let photoBlob = null;
 
-                <div class="form-group">
-                    <label for="instansi">Instansi/Alamat:</label>
-                    <input type="text" id="instansiInput" />
-                </div>
+    // Akses kamera
+    async function startCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      camera.srcObject = stream;
+    }
 
-                <div class="btn-container">
-                    <button type="button" id="saveButton">Daftar</button>
-                </div>
-            </form>
-        </div>
-    </main>
+    // Fungsi untuk mengambil foto
+    takePhotoButton.addEventListener('click', () => {
+    const context = canvas.getContext('2d');
+    canvas.width = camera.videoWidth;
+    canvas.height = camera.videoHeight;
+    context.drawImage(camera, 0, 0, canvas.width, canvas.height);
 
-    <script src="/scripts/APP"></script>
+    // Konversi ke Blob dalam format image/jpg
+    canvas.toBlob((blob) => {
+        photoBlob = blob;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+        previewImg.src = e.target.result;
+        previewImg.style.display = 'block'; // Tampilkan gambar preview
+        camera.style.display = 'none'; // Sembunyikan kamera
+        };
+        reader.readAsDataURL(blob);
+    }, 'image/jpg'); // Menentukan format JPG
+
+    takePhotoButton.style.display = 'none';
+    retakePhotoButton.style.display = 'inline-block';
+    scanKTPButton.disabled = false; // Aktifkan tombol Scan KTP
+    });
+
+    // Fungsi untuk retake foto
+    retakePhotoButton.addEventListener('click', () => {
+      photoBlob = null; // Reset foto
+      previewImg.style.display = 'none'; // Sembunyikan gambar preview
+      camera.style.display = 'block'; // Tampilkan kamera
+      takePhotoButton.style.display = 'inline-block';
+      retakePhotoButton.style.display = 'none';
+      scanKTPButton.disabled = true; // Nonaktifkan tombol Scan KTP
+    });
+
+    // Fungsi untuk scan KTP
+    scanKTPButton.addEventListener('click', async () => {
+      if (!photoBlob) {
+        alert('Ambil foto terlebih dahulu!');
+        return;
+      }
+
+      const formData = new FormData();
+      // Tentukan nama file untuk gambar
+      formData.append('image', photoBlob, 'photo.png'); // Menambahkan nama file dengan ekstensi yang sesuai
+
+      try {
+        const response = await fetch('http://localhost:5000/api/guests/scan', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          nikInput.value = result.extractedData.nik;
+          namaInput.value = result.extractedData.nama;
+          guestIdInput.value = result.newGuest.id;
+          alert('Scan berhasil!');
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.message}`);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('Terjadi kesalahan saat memindai KTP.');
+      }
+    });
+
+    // Fungsi untuk menyimpan data yang telah dikoreksi
+    saveButton.addEventListener('click', async () => {
+      const guestId = guestIdInput.value;
+      const nik = nikInput.value;
+      const nama = namaInput.value;
+      const instansi = instansiInput.value;
+
+      if (!guestId || !nik || !nama) {
+        alert('Harap lengkapi semua data!');
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/guests/${guestId}/update`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nik, nama, instansi }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert(result.message);
+          console.log('Updated Guest:', result.updatedGuest);
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.message}`);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('Terjadi kesalahan saat menyimpan data tamu.');
+      }
+    });
+
+    // Mulai akses kamera
+    startCamera();
+  </script>
 </body>
 </html>
