@@ -175,7 +175,7 @@ exports.updateGuestById = async (req, res) => {
         nik: nik || guestSnapshot.data().nik,
         nama: nama || guestSnapshot.data().nama,
         instansi: instansi || guestSnapshot.data().instansi,
-        imageUrl: `https://storage.googleapis.com/${bucket.name}/guests/${nik}${oldExtension}`, // Update URL gambar dengan ekstensi yang benar
+        imageUrl: `https://storage.googleapis.com/${bucket.name}/guests/${nik}${oldExtension}`,
       };
 
       await guestRef.set(updatedGuest);
