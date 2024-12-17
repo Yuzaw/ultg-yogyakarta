@@ -12,7 +12,7 @@ app.use(corsMiddleware);
 app.use(express.json());
 app.use(cookieParser()); 
 app.use(express.static('public'));
-app.use(express.static('public'));
+
 // Routes
 app.use('/', clientRoutes);
 app.use('/api', apiRoutes); // Prefix semua routes dengan /api

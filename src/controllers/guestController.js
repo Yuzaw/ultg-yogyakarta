@@ -5,14 +5,13 @@ const Tesseract = require('tesseract.js');
 const firestore = require('../config/firestore');
 const bucket = require('../config/storage');
 
-const guestCollection = firestore.collection('guests'); // Nama koleksi Firestore
+const guestCollection = firestore.collection('guests');
 
 // Get all guests
 exports.getAllGuest = async (req, res) => {
   try {
     const snapshot = await guestCollection.get();
     const guests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
     res.json({ message: 'All guests retrieved successfully!', guests });
   } catch (error) {
     console.error('Error fetching guests:', error);
@@ -20,21 +19,21 @@ exports.getAllGuest = async (req, res) => {
   }
 };
 
-// Get guest by NIK
-exports.getGuestByNIK = async (req, res) => {
-  const { nik } = req.params;
+// Get guest by ID
+exports.getGuestById = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const snapshot = await guestCollection.where('nik', '==', nik).get();
+    const guestSnapshot = await guestCollection.doc(id).get();
 
-    if (snapshot.empty) {
+    if (!guestSnapshot.exists) {
       return res.status(404).json({ message: 'Guest not found!' });
     }
 
-    const guest = snapshot.docs[0].data();
+    const guest = { id: guestSnapshot.id, ...guestSnapshot.data() };
     res.json({ message: 'Guest retrieved successfully!', guest });
   } catch (error) {
-    console.error('Error fetching guest by NIK:', error);
+    console.error('Error fetching guest by ID:', error);
     res.status(500).json({ message: 'Failed to retrieve guest', error: error.message });
   }
 };
@@ -207,53 +206,46 @@ exports.updateGuestById = async (req, res) => {
   }
 };
 
-// Update RFID by NIK
-exports.updateRFIDByNIK = async (req, res) => {
-  const { nik } = req.params;
+// Update RFID by ID
+exports.updateRFIDById = async (req, res) => {
+  const { id } = req.params;
   const { rfid_uid } = req.body;
 
   try {
-    const snapshot = await guestCollection.where('nik', '==', nik).get();
+    const guestRef = guestCollection.doc(id);
+    const guestSnapshot = await guestRef.get();
 
-    if (snapshot.empty) {
+    if (!guestSnapshot.exists) {
       return res.status(404).json({ message: 'Guest not found!' });
     }
 
-    const guestRef = snapshot.docs[0].ref;
-    const guestData = snapshot.docs[0].data();
-
-    const updatedGuest = { ...guestData, rfid_uid };
+    const updatedGuest = { ...guestSnapshot.data(), rfid_uid };
     await guestRef.set(updatedGuest);
 
-    res.json({
-      message: 'RFID UID updated successfully!',
-      updatedGuest,
-    });
+    res.json({ message: 'RFID updated successfully!', updatedGuest });
   } catch (error) {
     console.error('Error updating RFID:', error);
     res.status(500).json({ message: 'Failed to update RFID', error: error.message });
   }
 };
 
-// Delete guest
+// Delete guest by ID
 exports.deleteGuest = async (req, res) => {
-  const { nik } = req.params;
+  const { id } = req.params;
 
   try {
-    const snapshot = await guestCollection.where('nik', '==', nik).get();
+    const guestRef = guestCollection.doc(id);
+    const guestSnapshot = await guestRef.get();
 
-    if (snapshot.empty) {
+    if (!guestSnapshot.exists) {
       return res.status(404).json({ message: 'Guest not found!' });
     }
 
-    // Menghapus data tamu dari Firestore
-    await snapshot.docs[0].ref.delete();
+    const { imageUrl } = guestSnapshot.data();
+    const imageName = path.basename(imageUrl);
 
-    // Path gambar yang sesuai dengan NIK di Google Cloud Storage
-    const imageFile = bucket.file(`${nik}.jpg`);
-
-    // Menghapus file gambar dari Google Cloud Storage
-    await imageFile.delete();
+    await guestRef.delete();
+    await bucket.file(imageName).delete();
 
     res.json({ message: 'Guest and associated image deleted successfully!' });
   } catch (error) {
@@ -266,11 +258,8 @@ exports.downloadGuests = async (req, res) => {
   try {
     const snapshot = await guestCollection.get();
     const guests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // Specify the file name dynamically
     const fileName = `guests_data_${new Date().toISOString()}.csv`;
 
-    // Use the middleware function to send the CSV file with the dynamic filename
     res.jsonToCsv(guests, fileName);
   } catch (error) {
     res.status(500).json({ message: 'Failed to retrieve guests', error: error.message });

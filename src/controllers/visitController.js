@@ -15,16 +15,18 @@ exports.getAllVisits = async (req, res) => {
   }
 };
 
-// Get visit by NIK
-exports.getVisitByNIK = async (req, res) => {
-  const { nik } = req.params;
+// Get visit by ID
+exports.getVisitByID = async (req, res) => {
+  const { id } = req.params;
   try {
-    const snapshot = await visitCollection.where('nik', '==', nik).get();
-    if (snapshot.empty) {
+    const visitRef = visitCollection.doc(id);
+    const visitDoc = await visitRef.get();
+
+    if (!visitDoc.exists) {
       return res.status(404).json({ message: 'Visit not found!' });
     }
-    const visit = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    res.json({ message: 'Visit retrieved successfully!', visit });
+
+    res.json({ message: 'Visit retrieved successfully!', visit: { id, ...visitDoc.data() } });
   } catch (error) {
     res.status(500).json({ message: 'Failed to retrieve visit', error: error.message });
   }
@@ -49,6 +51,7 @@ exports.scanRFID = async (req, res) => {
       jam_in: new Date().toTimeString().split(' ')[0],
       jam_out: '-',
       tanggal: new Date().toISOString().split('T')[0],
+      no_kartu_daerah: '-', // Tambahkan field baru setelah tanggal
       no_kartu: '-',
       kendaraan_tamu: '-',
       plat_kendaraan: '-',
@@ -72,7 +75,7 @@ exports.scanRFID = async (req, res) => {
 // Add or Edit Visit Data
 exports.addVisit = async (req, res) => {
   const { id } = req.params;
-  const { keperluan, no_kartu, kendaraan_tamu, plat_kendaraan, security_induction } = req.body;
+  const { keperluan, no_kartu, kendaraan_tamu, plat_kendaraan, security_induction, no_kartu_daerah, ttd } = req.body;
 
   try {
     const visitRef = visitCollection.doc(id);
@@ -88,6 +91,8 @@ exports.addVisit = async (req, res) => {
       kendaraan_tamu: kendaraan_tamu || visitDoc.data().kendaraan_tamu,
       plat_kendaraan: plat_kendaraan || visitDoc.data().plat_kendaraan,
       security_induction: security_induction || visitDoc.data().security_induction,
+      no_kartu_daerah: no_kartu_daerah || visitDoc.data().no_kartu_daerah,
+      ttd: ttd || visitDoc.data().ttd,
     };
 
     await visitRef.update(updatedData);
@@ -113,10 +118,20 @@ exports.editJamOut = async (req, res) => {
       });
     }
 
+    // Ambil dokumen pertama yang cocok
     const visitDoc = snapshot.docs[0];
-    await visitDoc.ref.update({ jam_out: new Date().toTimeString().split(' ')[0] });
 
-    res.status(200).json({ message: 'Jam out updated successfully!', updatedVisit: visitDoc.data() });
+    // Update 'jam_out' dengan waktu saat ini
+    const updatedJamOut = new Date().toTimeString().split(' ')[0];
+    await visitDoc.ref.update({ jam_out: updatedJamOut });
+
+    // Ambil ulang dokumen yang diperbarui
+    const updatedDoc = await visitDoc.ref.get();
+
+    res.status(200).json({
+      message: 'Jam out updated successfully!',
+      updatedVisit: updatedDoc.data(), // Data terbaru setelah update
+    });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update jam_out', error: error.message });
   }
@@ -152,10 +167,8 @@ exports.downloadVisits = async (req, res, next) => {
     // Map the Firestore documents to a simple array of visit data
     const visits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Specify the file name dynamically
     const fileName = `visits_data_${new Date().toISOString()}.csv`;
 
-    // Use the middleware function to convert JSON to CSV and send the file with the dynamic filename
     res.jsonToCsv(visits, fileName); // Calls the middleware method
   } catch (error) {
     next(error); // Pass the error to the next middleware (error handler)

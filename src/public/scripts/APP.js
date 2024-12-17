@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>${visit.jam_in}</td>
                         <td>${visit.jam_out}</td>
                         <td>${visit.nik}</td>
-                        <td>${visit.noKartuDaerahBebas}</td>
+                        <td>${visit.no_kart_daerah}</td>
                         <td>${visit.no_kartu}</td>
                         <td>${visit.plat_kendaraan}</td>
                         <td>${visit.kendaraan_tamu}</td>
