@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Route utama untuk halaman frontend
 router.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/pages/login.html'));
+  res.sendFile(path.join(__dirname, '../public/pages/index.html'));
 });
 router.get('/homepage', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/pages/landingPage.html'));

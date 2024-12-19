@@ -212,6 +212,18 @@ exports.updateRFIDById = async (req, res) => {
   const { rfid_uid } = req.body;
 
   try {
+    // Cek apakah rfid_uid sudah digunakan oleh pengguna lain
+    const existingRFIDSnapshot = await guestCollection.where('rfid_uid', '==', rfid_uid).get();
+
+    // Jika ada dokumen lain dengan rfid_uid yang sama
+    if (!existingRFIDSnapshot.empty) {
+      // Pastikan ini bukan rfid_uid milik dokumen yang sedang diupdate
+      const conflictingDoc = existingRFIDSnapshot.docs.find(doc => doc.id !== id);
+      if (conflictingDoc) {
+        return res.status(400).json({ message: 'RFID UID is already in use by another guest!' });
+      }
+    }
+
     const guestRef = guestCollection.doc(id);
     const guestSnapshot = await guestRef.get();
 
