@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scanKTP</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP"></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <section class="scan-keluar">
+            <div class="scan-keluar-container">
+                <h2>Scan Keluar</h2>
+                <p>Scan KTP anda untuk keluar, Mohon lengkapi data di bawah ini:</p>
+                
+                <!-- Gambar Scan -->
+                <div class="scan-keluar-image">
+                    <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP anda">
+                </div>
+                
+
+                <div class="form-group">
+                    <label for="scan-keluar">RFID:</label>
+                    <input type="text" id="scan-keluar" name="scan-keluar" placeholder="RFID">
+                </div>
+                
+                <div class="button">
+                    <button type="submit" id="scanRfid">
+                        Scan Keluar
+                    </button>
+                </div>
+
+                <!-- Teks Berjajar ke Bawah -->
+                <div class="scan-keluar-text">
+                    <p><strong>Nama:</strong> <span id="nama"></span></p>
+                    <p><strong>Jam Keluar:</strong> <span id="jam-out"></span></p>
+                </div>
+                
+                <div class="button">
+                    <button type="submit" id="out">
+                        Home
+                    </button>
+                </div>
+
+            </div>
+        </section>
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div> <!-- Anda bisa menggunakan gambar spinner atau animasi -->
+        </div>
+
+    </main>
+
+    
+</body>
+<script>
+    document.getElementById("scanRfid").addEventListener("click", async function () {
+        const rfid = document.getElementById("scan-keluar").value;
+        const loadingSpinner = document.getElementById('loading');
+        if (!rfid) {
+            alert("Mohon masukkan RFID!");
+            return;
+        }
+
+        try {
+            loadingSpinner.style.display = 'flex';
+            const response = await fetch('/api/visits/out', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer YOUR_AUTH_TOKEN', // Ganti dengan token autentikasi Anda
+                },
+                body: JSON.stringify({ rfid_uid: rfid }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update jam out.');
+            }
+
+            const data = await response.json();
+
+            // Update the UI with the response data
+            document.getElementById("nama").textContent = data.updatedVisit.nama;
+            document.getElementById("jam-out").textContent = data.updatedVisit.jam_out;
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
+    });
+
+    document.getElementById("out").addEventListener("click", function () {
+        window.location.href = '/thanks?status=out';
+    });
+</script>
+</html>

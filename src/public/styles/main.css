@@ -1,0 +1,1053 @@
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('https://storage.cloud.google.com/ultg-yogyakarta/assets/background.png?authuser=1');
+    color: white;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    background-color: rgba(0, 0, 0, 0);
+    width: 100%;
+}
+
+.navigation img {
+    height: 50px;
+    margin-right: 20px;
+}
+
+.navigation h1 {
+    font-size: 24px;
+    color: #00ffff;
+    margin: 0;
+}
+
+.nav {
+    display: flex;
+    background-color: #000482;
+    border-radius: 10px;
+    margin-right: 20px;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    display: inline-block;
+    box-sizing: border-box;
+    background-color: transparent;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+.nav a:hover {
+    color: #00ffff;
+    border: 2px solid #ffffff;
+    border-radius: 3%;
+}
+.hamburger-menu {
+    display: none; /* Hide the hamburger menu on desktop */
+}
+
+/* Hide navigation links on small screens */
+@media (max-width: 768px) {
+    .nav {
+        display: none; /* Hide the navigation links by default */
+        width: 100%;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #000482;
+        opacity: 90%;
+        padding: 10px 0;
+        border-radius: 0;
+    }
+
+    .nav a {
+        margin: 10px 0;
+    }
+
+    .hamburger-menu {
+        display: block; /* Show hamburger icon */
+        cursor: pointer;
+    }
+
+    /* Optional: Style the hamburger menu */
+    .hamburger-menu {
+        font-size: 30px;
+        color: #ffffff;
+    }
+}
+
+/* When the menu is active, show the navigation links */
+.nav.active {
+    display: flex;
+}
+
+.loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #5c6bc0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Thanks Page */
+
+.main-thanks{
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    color: #333;
+}
+.thank-you-container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    padding: 40px 30px;
+    max-width: 500px;
+    width: 100%;
+    animation: fadeIn 1s ease-in-out;
+    border: 1px solid #ddd;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.thank-you-container h1 {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.thank-you-container p {
+    font-size: 1.2rem;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.thank-you-container img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.thank-you-button {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background: #6c5ce7;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-decoration: none;
+}
+
+.thank-you-button:hover {
+    background: #5a4db6;
+}
+
+
+
+
+/* Daftar Page */
+main {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    /* height: 100vh; */
+    display: flex;
+    justify-content: center; /* Pusatkan secara horizontal */
+    align-items: center;    /* Pusatkan secara vertikal */
+    color: white;
+}
+/* General container styles */
+.container {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 600px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+/* Heading styles */
+h1, h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Paragraph styles */
+p {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+/* Form group and label styles */
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ddd;
+}
+
+/* Input field styles */
+input[type="text"],
+input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #666;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #2a2a2a;
+    color: white;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:focus {
+    outline: none;
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px #6c63ff;
+}
+
+/* Button styles */
+button {
+    background-color: #6c63ff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background-color: #534bc4;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.btn-start-camera {
+    background-color: #2e7a31;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 40%;
+}
+
+.btn-start-camera:hover {
+    background-color: #246428;
+}
+
+.device-selector {
+    width: 40%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Camera container styles */
+#cameraContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+video, canvas {
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+}
+
+/* Button container for photo controls */
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+}
+
+/* Specific button styles */
+#takePhotoButton, 
+#retakePhotoButton, 
+#scanKTPButton {
+    background-color: #534bc4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#takePhotoButton:disabled, 
+#scanKTPButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#retakePhotoButton {
+    background-color: #a52e2e;
+}
+
+#retakePhotoButton:hover {
+    background-color: #7e222a;
+}
+
+/* choice pages */
+.choices-container {
+    text-align: center;
+}
+
+.main-title {
+    font-size: 60px;
+    margin-bottom: 0.5em;
+}
+
+.main-description {
+    font-size: 30px;
+    margin-bottom: 2em;
+}
+
+.choices {
+    display: flex;
+    gap: 2em;
+    justify-content: center;
+}
+
+.choice-card {
+    background-color: #3c3ccd;
+    padding: 50px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+    transition: transform 0.3s;
+    text-decoration: none;
+    color: white;
+}
+
+.choice-card:hover {
+    transform: scale(1.05);
+}
+
+.choice-card img {
+    width: auto;
+    height: 150px;
+    margin-bottom: 1em;
+}
+
+.choice-title {
+    font-size: 40px;
+    margin: 0;
+}
+
+.choice-card.choice-register {
+    background-color: #3c3ccd;
+}
+
+.choice-card.choice-enter {
+    background-color: #4b0082;
+}
+
+.choice-card.choice-exit {
+    background-color: #ac1f86;
+}
+
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2em;
+    }
+
+    .main-description {
+        font-size: 1em;
+    }
+
+    .choices {
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .choice-card {
+        width: 100%;
+    }
+}
+
+
+
+
+
+
+/* Main Content Scan KTP*/
+.scan-ktp-container {
+    width:800px;
+    background-color: rgba(255, 255, 255, 0.1); 
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px; 
+    
+}
+
+/* Heading */
+.scan-ktp-container h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Subtext */
+.scan-ktp-container p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #ddd;
+}
+
+/* Camera Placeholder (for KTP scanning) */
+.camera-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #444;
+    border-radius: 10px;
+    border: 3px dashed #fff;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Form Fields */
+.scan-ktp-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+/* Input Fields in a Row */
+.scan-ktp-form .form-group-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Labels */
+.scan-ktp-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ddd;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Input Fields */
+.scan-ktp-form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #666;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #2a2a2a;
+    color: white;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Focus State for Input Fields */
+.scan-ktp-form input[type="text"]:focus {
+    outline: none;
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px #6c63ff;
+}
+
+
+/* Button Styling */
+.scan-ktp-form .button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.scan-ktp-form button {
+    background-color: #6c63ff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Button Hover Effect */
+.scan-ktp-form button:hover {
+    background-color: #534bc4;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+
+
+/* Main Content Scan Keluar */
+/* Main Content Scan Keluar */
+.scan-keluar-container {
+    width: 100%;
+    max-width: 800px; 
+    padding: 20px; 
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: rgba(255, 255, 255, 0.1); 
+    border: 1px solid #ddd;
+}
+
+/* Heading */
+.scan-keluar-container h2 {
+    font-size: clamp(24px, 5vw, 32px); 
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Subtext */
+.scan-keluar-container p {
+    font-size: clamp(14px, 4vw, 18px); 
+    margin-bottom: 30px;
+    color: #ddd;
+}
+
+/* Gambar Scan */
+.scan-keluar-image {
+    width: 100%;
+    height: 200px;
+    background-color: transparent; 
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scan-keluar-image img {
+    width: 100%;
+    max-width: 400px;
+    height: auto; 
+    border-radius: 8px;
+}
+
+/* Teks Berjajar ke Bawah */
+.scan-keluar-text {
+    text-align: left;
+    color: #ddd;
+    font-size: clamp(14px, 3vw, 18px);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Styling for each p element */
+.scan-keluar-text p {
+    margin-bottom: 10px;
+}
+
+/* Strong text for labels */
+.scan-keluar-text strong {
+    color: #6c63ff; 
+}
+
+.form-group-radio-keluar {
+    margin-top: 30px;
+}
+
+/* ========== RESPONSIVE LAYOUT ========== */
+@media (max-width: 768px) { /* Tablet */
+    .scan-keluar-container {
+        padding: 15px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .scan-keluar-container h2 {
+        font-size: 28px; 
+    }
+
+    .scan-keluar-container p {
+        font-size: 16px; 
+    }
+
+    .scan-keluar-image {
+        height: 180px; 
+    }
+
+    .scan-keluar-text {
+        font-size: 16px; 
+    }
+}
+
+@media (max-width: 480px) { /* Mobile */
+    .scan-keluar-container {
+        padding: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .scan-keluar-container h2 {
+        font-size: 24px; 
+    }
+
+    .scan-keluar-container p {
+        font-size: 14px; 
+    }
+
+    .scan-keluar-image {
+        height: 150px; 
+    }
+
+    .scan-keluar-text {
+        font-size: 14px; 
+    }
+
+    .scan-keluar-text p {
+        margin-bottom: 8px; 
+    }
+
+    .form-group-radio-keluar {
+        margin-top: 20px; 
+    }
+}
+
+
+
+/* scan RFID */
+.scan-RFID {
+    width: 100%;
+    max-width: 400px; 
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 20px; 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+}
+
+.scan-RFID-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.scan-RFID h2 {
+    font-size: clamp(24px, 5vw, 32px); /* Responsif, min 24px, max 32px */
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.scan-RFID p {
+    font-size: clamp(14px, 4vw, 18px); /* Responsif font size */
+    margin-bottom: 30px;
+    color: #ddd;
+}
+
+.scan-RFID-image {
+    width: 100%;
+    height: 200px;
+    background-color: transparent;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scan-RFID-image img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.scan-visits-form input[type="text"]:focus {
+    outline: none;
+    border-color: #6c63ff;
+    box-shadow: 0 0 5px #6c63ff;
+}
+
+
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .scan-RFID {
+        padding: 15px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .scan-RFID h2 {
+        font-size: 28px;
+    }
+
+    .scan-RFID p {
+        font-size: 16px;
+    }
+
+    .scan-RFID-image {
+        height: 180px;
+    }
+
+    .form-group input {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .button button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .scan-RFID h2 {
+        font-size: 1.2rem;
+    }
+
+    .scan-RFID p {
+        font-size: 0.8rem;
+    }
+
+    .form-group input {
+        padding: 6px;
+        font-size: 0.8rem;
+    }
+
+    .button button {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+}
+
+
+
+
+
+/*--------------------------------------------*/
+.ultg-content {
+    padding: 20px;
+    text-align: center;
+    overflow-x: auto
+    /* margin-bottom: 500px; */
+    
+  }
+  
+  .ultg-heading {
+    font-size: 32px;
+  }
+  .ultg-table-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .ultg-table {
+    width: 1200px;
+    border-collapse: collapse;
+    background-color: #222;
+    color: white;
+    
+    overflow: hidden;
+  }
+  
+  .ultg-table th,
+  .ultg-table td {
+    border: 1px solid #555;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .ultg-table th {
+    background-color: #444;
+    font-size: 18px;
+  }
+  
+  .ultg-table td {
+    font-size: 16px;
+  }
+  
+  .ultg-table th:first-child {
+    width: 10%;
+  }
+  
+  /* Download Button */
+  .ultg-download-button {
+    display: flex;
+    justify-content: flex-end; 
+    width: 100%; 
+    margin-bottom: 10px; 
+}
+
+.ultg-download-button button {
+    margin-right: 20px; 
+    background-color: #008CBA; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px; 
+}
+
+.ultg-download-button button:hover {
+    background-color: #005f73; 
+}
+
+@media screen and (max-width: 768px) {
+    .ultg-heading {
+        font-size: 20px;
+    }
+
+    .ultg-table th {
+        font-size: 10px;
+    }
+      
+    .ultg-table td {
+        font-size: 8px;
+    }
+}
+
+
+/* Generate RFID PAGE */
+.scan-visits-card {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.scan-visits-card h3{
+    text-align: center;
+    font-size: 30;
+}
+
+.scan-visits-card2 {
+    width: 40%;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.scan-visits-card2 h2{
+    text-align: center;
+    font-size: 30;
+}
+
+
+.scan-visits-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.scan-visits-form input, 
+.scan-visits-form select, 
+.scan-visits-form button {
+    margin-bottom: 15px;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.scan-visits-form button {
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.scan-visits-form button:hover {
+    background-color: #534bc4;
+}
+
+
+
+
+/* Container untuk tabel tamu */
+.container-guest{
+    justify-content: center;
+    text-align: center;
+    overflow-x: auto
+}
+.guest-table-container {
+    overflow-x: auto; /* Scroll horizontal untuk layar kecil */
+    margin: 20px;
+    border: 1px solid #555;
+
+}
+
+.button-download-kunjungan {
+    display: flex;
+    justify-content: flex-end; /* Membuat tombol di sebelah kanan */
+    width: 100%; /* Buat kontainer selebar parent */
+    margin-bottom: 10px; /* Jarak bawah antara tombol dan tabel */
+}
+
+.button-download-kunjungan button {
+    margin-right: 20px; /* Memberi jarak dari tepi kanan */
+    background-color: #008CBA; /* Warna biru untuk tombol */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px; /* Membuat sudut tombol melengkung */
+}
+
+.button-download-kunjungan button:hover {
+    background-color: #005f73; /* Warna saat hover */
+}
+
+
+/* Tabel */
+.guest-table {
+    width: 100%;
+    min-width: 1200px; /* Set minimum lebar tabel agar tetap penuh di layar kecil */
+    border-collapse: collapse;
+    background-color: #333;
+    color: white;
+
+    overflow: hidden;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.guest-table th,
+.guest-table td {
+    border: 1px solid #555;
+    padding: 10px;
+    text-align: center;
+}
+
+.guest-table th {
+    background-color: #444;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.guest-table td {
+    background-color: #222;
+}
+
+/* Header bertingkat */
+.guest-table th[colspan] {
+    background-color: #444;
+}
+
+/* Responsivitas */
+@media screen and (max-width: 768px) {
+    .guest-table-container {
+        margin: 10px;
+    }
+    .guest-table {
+        font-size: 12px; /* Kurangi ukuran font agar lebih sesuai */
+    }
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terima Kasih</title>
+    <link rel="stylesheet" href="/style/main">
+</head>
+<body>
+    <main class="main-thanks">
+        <div class="thank-you-container">
+            <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/logo.png?authuser=1" alt="logo" width="50">
+            <h1>Terima Kasih!</h1>
+            <p id="thank-you-message">Selamat menikmati kunjungan Anda. Kami berharap Anda memiliki pengalaman yang menyenangkan!</p>
+            <a href="/homepage" class="thank-you-button">Kembali ke Beranda</a>
+        </div>
+    </main>
+
+    <script>
+        // Mengambil query string dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');  
+
+        // Mengubah pesan berdasarkan nilai 'status' pada URL
+        const messageElement = document.getElementById('thank-you-message');
+        if (status === 'out') {
+            messageElement.textContent = 'Terima kasih telah berkunjung. Kami berharap Anda membawa pengalaman yang menyenangkan!';
+        } else {
+            messageElement.textContent = 'Selamat menikmati kunjungan Anda. Kami berharap Anda memiliki pengalaman yang menyenangkan!';
+        }
+    </script>
+</body>
+</html>

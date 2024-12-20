@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scanKTP</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP"></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+    <main>
+        <section class="scan-RFID">
+            <div class="scan-RFID-container">
+                <h2>Generate RFID</h2>
+                <p>Scan RFID anda:</p>
+                
+                <!-- Gambar Scan -->
+                <div class="scan-RFID-image">
+                    <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP anda">
+                </div>
+                
+                <div class="form-group">
+                    <label for="rfid">RFID:</label>
+                    <input type="text" id="rfid" name="rfid" placeholder="rfid">
+                </div>
+                
+                
+                <div class="button">
+                    <button type="submit" id="generate">
+                        Selesai
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div> <!-- Anda bisa menggunakan gambar spinner atau animasi -->
+            </div>
+        </section>
+    </main>
+
+    
+</body>
+<script> 
+const buttonGenerate = document.getElementById('generate'); // Button Generate
+        const inputRFID = document.getElementById('rfid'); 
+        const loadingSpinner = document.getElementById('loading');        
+
+        buttonGenerate.addEventListener('click', async () => {
+        // Ambil guestId dari localStorage
+        const guestId = localStorage.getItem('guestId');
+
+        if (!guestId) {
+            alert('Guest ID tidak ditemukan di localStorage!');
+            return;
+        }
+
+        // Pastikan input RFID tidak kosong
+        const rfidValue = inputRFID.value.trim();
+        if (!rfidValue) {
+            alert('Silakan masukkan RFID terlebih dahulu!');
+            return;
+        }
+
+        try {
+            // Kirim request ke backend
+            const response = await fetch(`/api/guests/${guestId}/rfid`, {
+            method: 'PUT', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ rfid_uid: rfidValue }),
+            });
+
+            const result = await response.json();
+            loadingSpinner.style.display = 'flex';
+            if (response.ok) {
+            // alert('RFID berhasil diperbarui!');
+            loadingSpinner.style.display = 'none';
+            console.log('Response:', result);
+
+            window.location.href = '/in'; 
+            } else {
+            alert(`Gagal memperbarui RFID: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error saat mengupdate RFID:', error);
+            alert('Terjadi kesalahan saat memperbarui RFID.');
+        }
+        });
+</script>
+
+</html>

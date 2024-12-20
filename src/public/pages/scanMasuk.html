@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan KTP</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP"></script>
+    
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <!-- Card for Scan RFID -->
+        <section class="scan-visits-card" id="visitScan">
+            <h1>RFID Visit Management</h1>
+            <h3>Scan RFID</h3>
+
+            <div class="scan-keluar-image">
+                <img src="https://storage.cloud.google.com/ultg-yogyakarta/assets/icon2.png?authuser=1" alt="Scan KTP anda">
+            </div>
+
+            <form id="rfidForm" class="scan-visits-form">
+                <label for="rfid_uid">RFID UID:</label>
+                <input type="text" id="rfid_uid" name="rfid_uid" placeholder="RFID" required>
+                <button type="button" onclick="scanRFID()">Scan</button>
+            </form>
+        </section>
+
+        <!-- Card for Visit Form -->
+        <section class="scan-visits-card2" id="visitForm" style="display:none;">
+            <h2>Visit Details</h2>
+            <form class="scan-visits-form">
+                <label for="keperluan">Keperluan:</label>
+                <input type="text" id="keperluan" name="keperluan">
+
+                <label for="no_kartu">Nomor Kartu:</label>
+                <input type="text" id="no_kartu" name="no_kartu">
+
+                <label for="kendaraan_tamu">Kendaraan Tamu:</label>
+                <input type="text" id="kendaraan_tamu" name="kendaraan_tamu">
+
+                <label for="plat_kendaraan">Plat Kendaraan:</label>
+                <input type="text" id="plat_kendaraan" name="plat_kendaraan">
+
+                <label for="security_induction">Security Induction:</label>
+                <select id="security_induction" name="security_induction">
+                    <option value="belum">Belum</option>
+                    <option value="sudah">Sudah</option>
+                </select>
+
+                <label for="no_kartu_daerah">Nomor Kartu Daerah:</label>
+                <select id="no_kartu_daerah" name="no_kartu_daerah">
+                    <option value="tidak">Tidak</option>
+                    <option value="ya">Ya</option>
+                </select>
+
+                <label for="ttd">TTD:</label>
+                <select id="ttd" name="ttd">
+                    <option value="tidak">Tidak</option>
+                    <option value="ya">Ya</option>
+                </select>
+
+                <button type="button" onclick="addVisit()">Submit Visit</button>
+            </form>
+        </section>
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div> <!-- Anda bisa menggunakan gambar spinner atau animasi -->
+        </div>
+    </main>
+
+    <script >
+         let visitId = null;
+        async function scanRFID() {
+            const rfidUID = document.getElementById('rfid_uid').value;
+            const loadingSpinner = document.getElementById('loading');
+            const visitScan = document.getElementById('visitScan');
+            
+
+            if (!rfidUID) {
+                alert('Please enter RFID UID!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/visits/in', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer your-auth-token'
+                    },
+                    body: JSON.stringify({ rfid_uid: rfidUID })
+                });
+
+                const result = await response.json();
+                loadingSpinner.style.display = 'flex';
+                if (response.ok) {
+                    visitId = result.visitDetails.id;
+                    
+                    loadingSpinner.style.display = 'none';
+                    visitScan.style.display = 'none';
+                    document.getElementById('visitForm').style.display = 'block';
+                } else {
+                    alert(result.message || 'Failed to scan RFID!');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred while scanning RFID.');
+            }
+        }
+
+        async function addVisit() {
+            if (!visitId) {
+                alert('Scan RFID first!');
+                return;
+            }
+            const loadingSpinner = document.getElementById('loading');
+            const formData = {
+                keperluan: document.getElementById('keperluan').value,
+                no_kartu: document.getElementById('no_kartu').value,
+                kendaraan_tamu: document.getElementById('kendaraan_tamu').value,
+                plat_kendaraan: document.getElementById('plat_kendaraan').value,
+                security_induction: document.getElementById('security_induction').value,
+                no_kartu_daerah: document.getElementById('no_kartu_daerah').value,
+                ttd: document.getElementById('ttd').value
+                
+            };
+
+            try {
+                const response = await fetch(`/api/visits/${visitId}/in`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer your-auth-token'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                loadingSpinner.style.display = 'flex';
+                if (response.ok) {
+                    
+                    loadingSpinner.style.display = 'none';
+
+                    window.location.href = '/thanks?status=visit';
+                } else {
+                    alert(result.message || 'Failed to submit visit data!');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred while submitting visit data.');
+            }
+        }
+    </script>
+</body>
+</html>

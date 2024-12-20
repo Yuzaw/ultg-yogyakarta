@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Management</title>
+    <link rel="stylesheet" href="/style/main">
+    <script src="/scripts/include" defer></script>
+    <script src="/scripts/mainAPP" defer></script>
+</head>
+<body>
+    <header>
+        <div data-include="/navigation"></div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Daftar Tamu Baru</h1>
+
+            <!-- Live Camera Section -->
+            <div id="cameraContainer">
+
+                <video id="camera" autoplay playsinline style="width: 100%; max-width: 400px; border-radius: 8px; display: none;"></video>
+                
+                
+                <canvas id="canvas" style="display: none;"></canvas>
+                <img id="previewImg" src="" alt="Preview Gambar" style="width: 100%; max-width: 400px; border-radius: 8px; display: none;"/>
+                <select id="cameraSelector" class="device-selector">
+                    <option value="">Pilih Kamera</option>
+                </select>
+                
+                <button id="startCameraButton" class="btn-start-camera">Nyalakan Kamera</button>
+                <div class="btn-container">
+                    <button id="takePhotoButton" >Take Foto</button>
+                    <button id="retakePhotoButton" style="display: none;">Retake Foto</button>
+                    <button id="scanKTPButton" disabled>Scan KTP</button>
+                </div>
+
+
+            </div>
+            
+            <div id="loading" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div> <!-- Anda bisa menggunakan gambar spinner atau animasi -->
+            </div>  
+
+            <h2>Form Data Tamu</h2>
+            <form id="guestForm">
+                <input type="hidden" id="guestId" />
+
+                <div class="form-group">
+                    <label for="nik">NIK:</label>
+                    <input type="text" id="nikInput" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="nama">Nama:</label>
+                    <input type="text" id="namaInput" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="instansi">Instansi/Alamat:</label>
+                    <input type="text" id="instansiInput" />
+                </div>
+
+                <div class="button">
+                    <button type="button" id="saveButton">Daftar</button>
+                </div>
+            </form>
+        </div>
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div> <!-- Anda bisa menggunakan gambar spinner atau animasi -->
+        </div>  
+    </main>
+
+    <script src="/scripts/APP"></script>
+</body>
+</html>
